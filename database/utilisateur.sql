@@ -1,4 +1,4 @@
--- Active: 1770879250579@@127.0.0.1@3306@objectif_sport
+-- Active: 1772587047178@@127.0.0.1@3306@objectif_sport
 CREATE TABLE Utilisateurs (
     id          INT PRIMARY KEY AUTO_INCREMENT,
     pseudo      VARCHAR(50) NOT NULL UNIQUE,
@@ -34,3 +34,28 @@ INSERT INTO Utilisateurs (pseudo, email, mdp_hash, date, taille, poids, sexe) VA
 ('samuel_bergeron', 'samuel.bergeron@gmail.com', '3c59dc048e885024', '1998-09-16', 174, 79.2, 'homme');
 
 SELECT * FROM Utilisateurs;
+-- Ajouter la colonne imc
+ALTER TABLE Utilisateurs ADD COLUMN imc DECIMAL(4,2);
+
+DELIMITER $$
+
+CREATE PROCEDURE mettre_a_jour_imc(IN p_id INT)
+BEGIN
+    DECLARE v_poids DECIMAL(5,2);
+    DECLARE v_taille INT;
+    DECLARE v_imc DECIMAL(4,2);
+
+    SELECT poids, taille INTO v_oids, v_taille
+    FROM Utilisateursp
+    WHERE id = p_id;
+
+    SET v_imc = v_poids / ((v_taille / 100.0) * (v_taille / 100.0));
+
+    UPDATE Utilisateurs
+    SET imc = v_imc
+    WHERE id = p_id;
+END$$
+DELIMITER ;
+
+SELECT * FROM Utilisateurs;
+CALL mettre_a_jour_imc(1);

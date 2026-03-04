@@ -1,0 +1,36 @@
+-- Active: 1770879250579@@127.0.0.1@3306@objectif_sport
+CREATE TABLE Utilisateurs (
+    id          INT PRIMARY KEY AUTO_INCREMENT,
+    pseudo      VARCHAR(50) NOT NULL UNIQUE,
+    email       VARCHAR(100) NOT NULL UNIQUE,
+    mdp_hash    VARCHAR(255) NOT NULL,
+    date        DATE NOT NULL,
+    taille      SMALLINT NOT NULL,
+    poids       DECIMAL(5,2) NOT NULL,
+    sexe        ENUM('homme', 'femme', 'autre') NOT NULL
+);
+
+
+INSERT INTO Utilisateurs (pseudo, email, mdp_hash, date, taille, poids, sexe) VALUES
+('hachim_tib', 'hachim.tib@gmail.com', 'e3b0c44298fc1c14', '2000-05-14', 175, 72.5, 'homme'),
+('melvin_roy', 'melvin.roy@gmail.com', 'a87ff679a2f3e71d', '1999-03-22', 180, 85.0, 'homme'),
+('sara_leblanc', 'sara.leblanc@gmail.com', 'eccbc87e4b5ce2fe', '2001-07-10', 165, 60.2, 'femme'),
+('alex_martin', 'alex.martin@gmail.com', 'c4ca4238a0b92382', '1998-11-05', 178, 78.3, 'homme'),
+('jade_tremblay', 'jade.tremblay@gmail.com', '1679091c5a880faf', '2002-01-30', 162, 55.8, 'femme'),
+('noah_gagnon', 'noah.gagnon@gmail.com', '8f14e45fceea167a', '2000-08-19', 183, 90.1, 'homme'),
+('chloe_fortin', 'chloe.fortin@gmail.com', 'c9f0f895fb98ab91', '1997-04-25', 168, 63.4, 'femme'),
+('liam_bouchard', 'liam.bouchard@gmail.com', '45c48cce2e2d7fbd', '2003-12-03', 176, 74.0, 'homme'),
+('emma_lavoie', 'emma.lavoie@gmail.com', 'd3d9446802a44259', '2001-09-17', 160, 52.7, 'femme'),
+('ethan_cote', 'ethan.cote@gmail.com', '6512bd43d9caa6e0', '1999-06-08', 185, 95.5, 'homme'),
+('olivia_paquin', 'olivia.paquin@gmail.com', 'c20ad4d76fe97759', '2000-02-14', 163, 57.9, 'femme'),
+('gabriel_roy', 'gabriel.roy@gmail.com', 'c51ce410c124a10e', '1998-07-21', 179, 82.0, 'homme'),
+('zoe_archambault', 'zoe.archambault@gmail.com', 'aab3238922bcc25a', '2002-10-09', 166, 61.1, 'femme'),
+('felix_girard', 'felix.girard@gmail.com', '9bf31c7ff062936a', '1997-05-30', 182, 88.3, 'homme'),
+('lea_chartrand', 'lea.chartrand@gmail.com', 'c74d97b01eae257e', '2003-03-15', 161, 54.6, 'femme'),
+('william_lemay', 'william.lemay@gmail.com', '70efdf2ec9b08693', '2001-11-28', 177, 76.8, 'homme'),
+('camille_bisson', 'camille.bisson@gmail.com', '6f4922f45568161a', '1999-08-04', 167, 62.3, 'femme'),
+('thomas_nadeau', 'thomas.nadeau@gmail.com', '1f0e3dad99908345', '2000-04-11', 181, 86.7, 'homme'),
+('anais_dupont', 'anais.dupont@gmail.com', '98f13708210194c4', '2002-06-22', 164, 58.4, 'femme'),
+('samuel_bergeron', 'samuel.bergeron@gmail.com', '3c59dc048e885024', '1998-09-16', 174, 79.2, 'homme');
+
+SELECT * FROM Utilisateurs;

@@ -13,7 +13,9 @@ CREATE TABLE Utilisateurs (
     poids       DECIMAL(5,2)    NOT NULL CHECK (poids BETWEEN 20 AND 300),
     sexe        ENUM('homme', 'femme', 'autre') NOT NULL,
     imc         DECIMAL(4,2)
-);
+)AUTO_INCREMENT = 101;
+
+DROP TABLE IF EXISTS Utilisateurs;
 
 -- =============================================
 -- Insertion des 20 utilisateurs
@@ -39,7 +41,7 @@ INSERT INTO Utilisateurs (pseudo, email, mdp_hash, date, taille, poids, sexe) VA
 ('thomas_nadeau',   'thomas.nadeau@gmail.com',    '1f0e3dad99908345', '2000-04-11', 181, 86.7,  'homme'),
 ('anais_dupont',    'anais.dupont@gmail.com',     '98f13708210194c4', '2002-06-22', 164, 58.4,  'femme'),
 ('samuel_bergeron', 'samuel.bergeron@gmail.com',  '3c59dc048e885024', '1998-09-16', 174, 79.2,  'homme');
-
+ SELECT * FROM Utilisateurs;
 -- =============================================
 -- Procédure : mettre_a_jour_imc
 -- Description : Calcule et stocke l'IMC d'un
@@ -80,5 +82,5 @@ DELIMITER ;
 -- =============================================
 -- Test : appel de la procédure + vérification
 -- =============================================
-CALL imc_de_utilisateur(4);
-SELECT pseudo, taille, poids, imc FROM Utilisateurs WHERE id = 4;
+CALL imc_de_utilisateur(101);
+SELECT pseudo, taille, poids, imc FROM Utilisateurs WHERE id = 101;

@@ -2,10 +2,10 @@
 CREATE TABLE Muscles (
     id          INT PRIMARY KEY AUTO_INCREMENT,
     nom_muscle  VARCHAR(50) NOT NULL UNIQUE,
-    partie      VARCHAR(50) NOT NULL
+    categorie      VARCHAR(50) NOT NULL
 );
 
-INSERT INTO Muscles (nom_muscle, partie) VALUES
+INSERT INTO Muscles (nom_muscle, categorie) VALUES
 ('Grand dorsal', 'Dos'),
 ('Trapèzes', 'Dos'),
 ('Lombaires', 'Dos'),

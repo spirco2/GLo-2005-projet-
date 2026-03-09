@@ -3,12 +3,6 @@ DROP TABLE IF EXISTS cibler;
 DROP TABLE IF EXISTS exercice;
 DROP TABLE IF EXISTS muscle;
 
--- Table de Hakim (reproduite pour la compatibilité des FK)
-CREATE TABLE muscle (
-    id_muscle INT PRIMARY KEY AUTO_INCREMENT,
-    nom_muscle VARCHAR(50) NOT NULL
-);
-
 
 CREATE TABLE exercice (
     id_ex INT PRIMARY KEY AUTO_INCREMENT,

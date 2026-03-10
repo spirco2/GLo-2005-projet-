@@ -3,13 +3,15 @@
 -- Description : Stocke les groupes musculaires
 --               et leur catégorie
 -- =============================================
+CREATE DATABASE db_local;
+DROP TABLE IF EXISTS Muscles;
 
 CREATE TABLE Muscles (
-    id          INT          PRIMARY KEY AUTO_INCREMENT,
+    id_muscle   INT          PRIMARY KEY AUTO_INCREMENT,
     nom_muscle  VARCHAR(50)  NOT NULL UNIQUE,
     categorie   VARCHAR(50)  NOT NULL
 );
-DROP TABLE IF EXISTS Muscles;
+
 -- =============================================
 -- Insertion des 20 muscles
 -- =============================================

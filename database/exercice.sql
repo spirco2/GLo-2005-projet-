@@ -1,7 +1,6 @@
 
 DROP TABLE IF EXISTS cibler;
 DROP TABLE IF EXISTS exercice;
-DROP TABLE IF EXISTS muscle;
 
 
 CREATE TABLE exercice (
@@ -17,18 +16,11 @@ CREATE TABLE cibler (
     id_ex INT,
     id_muscle INT,
     PRIMARY KEY (id_ex, id_muscle),
-    FOREIGN KEY (id_ex) REFERENCES exercice(id_ex) ON DELETE CASCADE,
-    FOREIGN KEY (id_muscle) REFERENCES muscle(id_muscle) ON DELETE CASCADE
+    CONSTRAINT fk_cibler_exercice FOREIGN KEY (id_ex)
+        REFERENCES exercice(id_ex)   ON DELETE CASCADE,
+    CONSTRAINT fk_cibler_muscle   FOREIGN KEY (id_muscle)
+        REFERENCES muscles(id_muscle) ON DELETE CASCADE
 );
-
-
-
-INSERT INTO muscle (id_muscle, nom_muscle) VALUES
-(1, 'Pectoraux'), (2, 'Dos'), (3, 'Épaules'), (4, 'Triceps'), (5, 'Biceps'),
-(6, 'Avant-bras'), (7, 'Trapèzes'), (8, 'Lombaires'), (9, 'Abdominaux'),
-(10, 'Obliques'), (11, 'Quadriceps'), (12, 'Ischio-jambiers'), (13, 'Fessiers'),
-(14, 'Mollets'), (15, 'Adducteurs'), (16, 'Abducteurs'), (17, 'Cardio'), (18, 'Full Body');
-
 
 
 INSERT INTO exercice (id_ex, nom, equipement, description, difficulte) VALUES
@@ -152,15 +144,14 @@ INSERT INTO cibler (id_ex, id_muscle) VALUES
 (89, 2), (90, 17), (91, 17), (92, 3), (93, 3), (94, 11), (94, 17), (95, 11),
 (96, 14), (97, 18), (98, 17), (99, 7), (100, 7);
 
-
+DROP PROCEDURE IF EXISTS calculer_volume_seance;
 SELECT * FROM exercice ;
 DELIMITER //
-
 CREATE PROCEDURE calculer_volume_seance(IN p_id_seance INT)
 BEGIN
     -- Calcul du volume total pour la séance donnée
     -- On utilise une jointure pour récupérer le poids de l'utilisateur si c'est du poids du corps
-    UPDATE Seances s
+    UPDATE seance s
     SET s.volume_total = (
         SELECT SUM(
             CASE
@@ -168,12 +159,29 @@ BEGIN
                 ELSE sl.poids * sl.reps
             END
         )
-        FROM Serie_log sl
-        JOIN Exercices e ON sl.id_exercice = e.id
-        JOIN Utilisateurs u ON s.id_u = u.id
+        FROM serie_log sl
+        JOIN exercice e ON sl.id_ex = e.id_ex
+        JOIN Utilisateurs u ON s.id_user = u.id
         WHERE sl.id_seance = p_id_seance
     )
-    WHERE s.id = p_id_seance;
+    WHERE s.id_seance = p_id_seance;
 END //
 
 DELIMITER ;
+
+
+-- Tester calculer_volume_seance
+-- Étape 1 : voir l'état avant (volume_total = 0)
+SELECT id_seance, id_user, volume_total FROM seance WHERE id_seance = 1;
+
+-- Étape 2 : vérifier les séries existantes pour la séance 1
+SELECT sl.id_seance, sl.id_ex, sl.poids, sl.reps, e.equipement
+FROM serie_log sl
+JOIN exercice e ON sl.id_ex = e.id_ex
+WHERE sl.id_seance = 1;
+
+-- Étape 3 : appeler la procédure
+CALL calculer_volume_seance(1);
+
+-- Étape 4 : vérifier que volume_total a été mis à jour
+SELECT id_seance, id_user, volume_total FROM seance WHERE id_seance = 1;

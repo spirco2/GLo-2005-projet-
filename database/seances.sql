@@ -1,12 +1,14 @@
-USE BD_LOCAL;
+USE db_local;
 
 DROP TABLE IF EXISTS seance;
 DROP TABLE IF EXISTS statistiques_utilisateurs;
 
 -- Table pour suivre l'assiduité des utilisateurs
 CREATE TABLE statistiques_utilisateurs (
-    id_user INT PRIMARY KEY,
-    semaines_consecutives INT DEFAULT 0
+    id_user               INT PRIMARY KEY,
+    semaines_consecutives INT DEFAULT 0,
+    CONSTRAINT fk_stats_user FOREIGN KEY (id_user)
+        REFERENCES Utilisateurs(id) ON DELETE CASCADE
 );
 
 -- Table Seance : occurrences réelles
@@ -18,7 +20,10 @@ CREATE TABLE seance (
     date_fin DATETIME,
     duree TIME,
     volume_total FLOAT DEFAULT 0,
-    FOREIGN KEY (id_programme) REFERENCES programme(id_programme) ON DELETE CASCADE
+    CONSTRAINT fk_seance_user FOREIGN KEY (id_user)
+        REFERENCES Utilisateurs(id) ON DELETE CASCADE,
+    CONSTRAINT fk_seance_prog FOREIGN KEY (id_programme)
+        REFERENCES programme(id_programme) ON DELETE CASCADE
 );
 
 -- Initialisation des utilisateurs présents dans les séances
@@ -103,6 +108,27 @@ BEGIN
 END //
 
 DELIMITER ;
+
+
+-- TEST calcul_assiduite
+-- Étape 1 : voir l'état actuel avant le test
+SELECT * FROM statistiques_utilisateurs WHERE id_user = 101;
+
+-- Étape 2 : insérer une séance dans la même semaine qu'une séance existante
+-- user 101 a déjà une séance le 2026-03-04, donc on insère le 2026-03-05
+INSERT INTO seance (id_user, id_programme, date_debut, date_fin, duree, volume_total)
+VALUES (101, 1, '2026-03-05 10:00:00', '2026-03-05 11:00:00', '01:00:00', 0);
+
+-- Étape 3 : vérifier que semaines_consecutives a augmenté
+SELECT * FROM statistiques_utilisateurs WHERE id_user = 101;
+
+-- Étape 4 : insérer une séance HORS de la fenêtre de 7 jours (gap de plus d'une semaine)
+INSERT INTO seance (id_user, id_programme, date_debut, date_fin, duree, volume_total)
+VALUES (101, 1, '2026-03-20 10:00:00', '2026-03-20 11:00:00', '01:00:00', 0);
+
+-- Étape 5 : vérifier que semaines_consecutives est remis à 1
+SELECT * FROM statistiques_utilisateurs WHERE id_user = 101;
+
 
 SELECT * FROM seance;
 SELECT * FROM statistiques_utilisateurs;

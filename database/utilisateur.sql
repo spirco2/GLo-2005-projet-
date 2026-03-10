@@ -3,19 +3,19 @@
 -- Description : Stocke les profils utilisateurs
 -- =============================================
 
-CREATE TABLE Utilisateurs (
-    id          INT             PRIMARY KEY AUTO_INCREMENT,
-    pseudo      VARCHAR(50)     NOT NULL UNIQUE,
-    email       VARCHAR(100)    NOT NULL UNIQUE,
-    mdp_hash    VARCHAR(255)    NOT NULL,
-    date        DATE            NOT NULL,
-    taille      SMALLINT        NOT NULL CHECK (taille BETWEEN 50 AND 250),
-    poids       DECIMAL(5,2)    NOT NULL CHECK (poids BETWEEN 20 AND 300),
-    sexe        ENUM('homme', 'femme', 'autre') NOT NULL,
-    imc         DECIMAL(4,2)
-)AUTO_INCREMENT = 101;
-
 DROP TABLE IF EXISTS Utilisateurs;
+
+CREATE TABLE Utilisateurs (
+    id        INT          PRIMARY KEY AUTO_INCREMENT,
+    pseudo    VARCHAR(50)  NOT NULL UNIQUE,
+    email     VARCHAR(100) NOT NULL UNIQUE,
+    mdp_hash  VARCHAR(255) NOT NULL,
+    date      DATE         NOT NULL,
+    taille    SMALLINT     NOT NULL CHECK (taille BETWEEN 50 AND 250),
+    poids     DECIMAL(5,2) NOT NULL CHECK (poids BETWEEN 20 AND 300),
+    sexe      ENUM('homme','femme','autre') NOT NULL,
+    imc       DECIMAL(4,2)
+) AUTO_INCREMENT = 101;
 
 -- =============================================
 -- Insertion des 20 utilisateurs
@@ -48,6 +48,7 @@ INSERT INTO Utilisateurs (pseudo, email, mdp_hash, date, taille, poids, sexe) VA
 --               utilisateur dans son profil
 -- Paramètre : p_id (INT) - id de l'utilisateur
 -- =============================================
+DROP PROCEDURE IF EXISTS imc_de_utilisateur;
 DELIMITER $$
 
 CREATE PROCEDURE imc_de_utilisateur(IN p_id INT)
@@ -74,8 +75,7 @@ BEGIN
     UPDATE Utilisateurs
     SET imc = v_imc
     WHERE id = p_id;
-
-END$$
+END $$
 
 DELIMITER ;
 

@@ -528,8 +528,7 @@
         #   'volume_total': 24830,
         #   'nb_seances': 151,
         #   'temps_total_min': 5420,
-        #   'nb_followers': 2,
-        #   'nb_following': 4,
+        #   'streak_semaines': 5,  # nb de semaines consécutives avec au moins 1 séance
         #   'weekly_data': [
         #     {'label': 'Jan 5', 'minutes': 45, 'pct': 12},
         #     {'label': 'Jan 12', 'minutes': 110, 'pct': 28},
@@ -587,14 +586,9 @@
         <div class="profile-stat-label">Séances</div>
       </div>
       <div class="profile-stat">
-        <!-- Flask: {{ stats.nb_followers }} -->
-        <div class="profile-stat-val" id="stat-followers">—</div>
-        <div class="profile-stat-label">Abonnés</div>
-      </div>
-      <div class="profile-stat">
-        <!-- Flask: {{ stats.nb_following }} -->
-        <div class="profile-stat-val" id="stat-following">—</div>
-        <div class="profile-stat-label">Abonnements</div>
+        <!-- Flask: {{ stats.streak_semaines }} -->
+        <div class="profile-stat-val" id="stat-streak">—</div>
+        <div class="profile-stat-label">Semaines d'affilée</div>
       </div>
     </div>
     <a href="/securite" class="btn btn-ghost" style="font-size:.78rem;text-decoration:none">Modifier le profil</a>

@@ -160,3 +160,13 @@ INSERT INTO cibler (id_ex, id_muscle) VALUES
 
 
 SELECT * FROM exercice ;
+
+-- Ajouts des index
+-- Index pour la recherche par nom (moteur de recherche du site)
+CREATE INDEX idx_exercice_nom ON exercice(nom);
+
+-- Index pour les filtres par difficulté et équipement
+CREATE INDEX idx_exercice_filtres ON exercice(difficulte, equipement);
+
+-- Index sur la table de liaison pour les jointures rapides avec les muscles
+CREATE INDEX idx_cibler_id_muscle ON cibler(id_muscle);

@@ -170,3 +170,4 @@ CREATE INDEX idx_exercice_filtres ON exercice(difficulte, equipement);
 
 -- Index sur la table de liaison pour les jointures rapides avec les muscles
 CREATE INDEX idx_cibler_id_muscle ON cibler(id_muscle);
+---

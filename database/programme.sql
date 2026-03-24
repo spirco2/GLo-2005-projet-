@@ -104,3 +104,9 @@ INSERT INTO seance (id_user, id_programme, date_debut, date_fin, duree, volume_t
 SELECT * FROM programme ;
 SELECT * FROM seance ;
 
+
+
+
+--Pour afficher rapidement la liste des programmes par leur nom
+CREATE INDEX idx_programme_nom ON programme(nom_programme);
+

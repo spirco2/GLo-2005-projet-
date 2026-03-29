@@ -47,3 +47,5 @@ INSERT INTO Muscles (nom_muscle, categorie) VALUES
 
 -- Vérification
 SELECT * FROM Muscles;
+
+CREATE INDEX idx_categorie ON Muscles(categorie);

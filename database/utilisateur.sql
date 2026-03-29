@@ -84,3 +84,12 @@ DELIMITER ;
 -- =============================================
 CALL imc_de_utilisateur(101);
 SELECT pseudo, taille, poids, imc FROM Utilisateurs WHERE id = 101;
+
+-- =============================================
+-- Indexation : Utilisateurs
+-- email et pseudo sont souvent utilisés pour
+-- la connexion et la recherche d'utilisateurs
+-- =============================================
+CREATE INDEX idx_email  ON Utilisateurs(email);
+CREATE INDEX idx_pseudo ON Utilisateurs(pseudo);
+CREATE INDEX idx_sexe   ON Utilisateurs(sexe);

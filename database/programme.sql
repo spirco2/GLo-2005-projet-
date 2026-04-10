@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS BD_LOCAL;
-USE BD_LOCAL;
+CREATE DATABASE IF NOT EXISTS db_local;
+USE db_local;
 
 DROP TABLE IF EXISTS seance;
 DROP TABLE IF EXISTS statistiques_utilisateurs;
@@ -36,3 +36,7 @@ INSERT INTO programme (id_programme, nom_programme, description_p, duree_semaine
 (20, 'Finisseur Explosif', 'Séances courtes et intenses en fin de cycle.', 2);
 
 SELECT * FROM programme;
+
+-- 1. Index sur le nom du programme
+-- Justification : Accélère la recherche textuelle lors de la navigation dans le catalogue.
+CREATE INDEX idx_nom_programme ON programme(nom_programme);

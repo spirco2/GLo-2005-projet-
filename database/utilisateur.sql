@@ -84,3 +84,43 @@ DELIMITER ;
 -- =============================================
 CALL imc_de_utilisateur(101);
 SELECT pseudo, taille, poids, imc FROM Utilisateurs WHERE id = 101;
+
+-- =============================================
+-- Indexation : Utilisateurs
+-- email et pseudo sont souvent utilisés pour
+-- la connexion et la recherche d'utilisateurs
+-- =============================================
+CREATE INDEX idx_email  ON Utilisateurs(email);
+CREATE INDEX idx_pseudo ON Utilisateurs(pseudo);
+CREATE INDEX idx_sexe   ON Utilisateurs(sexe);
+
+-- =============================================
+-- REQUÊTES AVANCÉES : Utilisateurs
+-- =============================================
+
+-- 1. Répartition des utilisateurs par sexe
+SELECT sexe, COUNT(*) AS total
+FROM Utilisateurs
+GROUP BY sexe;
+
+-- 2. IMC moyen par sexe
+SELECT sexe, ROUND(AVG(imc), 2) AS imc_moyen
+FROM Utilisateurs
+WHERE imc IS NOT NULL
+GROUP BY sexe;
+
+-- 3. Utilisateurs avec IMC le plus élevé (sous-requête)
+SELECT pseudo, poids, taille, imc
+FROM Utilisateurs
+WHERE imc = (SELECT MAX(imc) FROM Utilisateurs);
+
+-- 4. Utilisateurs en surpoids (IMC > 25)
+SELECT pseudo, imc
+FROM Utilisateurs
+WHERE imc > 25
+ORDER BY imc DESC;
+
+-- 5. Utilisateurs sans IMC calculé
+SELECT pseudo, poids, taille
+FROM Utilisateurs
+WHERE imc IS NULL;

@@ -132,3 +132,16 @@ SELECT * FROM statistiques_utilisateurs WHERE id_user = 101;
 
 SELECT * FROM seance;
 SELECT * FROM statistiques_utilisateurs;
+
+-- 1. Index Composite sur (id_user, date_debut)
+-- Justification : Crucial pour la performance de la gâchette 'calcul_assiduite'.
+-- Permet de trouver instantanément les séances d'un utilisateur dans une plage de dates.
+CREATE INDEX idx_seance_user_date ON seance(id_user, date_debut);
+
+-- 2. Index sur id_programme
+-- Justification : Accélère les jointures et le filtrage des séances par programme.
+CREATE INDEX idx_seance_programme ON seance(id_programme);
+
+-- 3. Index sur la date de début seule
+-- Justification : Optimise le tri chronologique des séances dans l'historique utilisateur.
+CREATE INDEX idx_seance_date_only ON seance(date_debut);

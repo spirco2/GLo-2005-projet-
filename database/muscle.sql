@@ -47,3 +47,34 @@ INSERT INTO Muscles (nom_muscle, categorie) VALUES
 
 -- Vérification
 SELECT * FROM Muscles;
+
+CREATE INDEX idx_categorie ON Muscles(categorie);
+
+-- =============================================
+-- REQUÊTES AVANCÉES : Muscles
+-- =============================================
+
+-- 1. Nombre de muscles par catégorie
+SELECT categorie, COUNT(*) AS nb_muscles
+FROM Muscles
+GROUP BY categorie
+ORDER BY nb_muscles DESC;
+
+-- 2. Liste complète triée par catégorie
+SELECT categorie, nom_muscle
+FROM Muscles
+ORDER BY categorie, nom_muscle;
+
+-- 3. Muscles travaillés par un exercice donné (jointure avec exercice)
+SELECT e.nom AS exercice, m.nom_muscle, m.categorie
+FROM exercice e
+JOIN cibler c ON e.id_ex = c.id_ex
+JOIN Muscles m ON c.id_muscle = m.id_muscle
+WHERE e.id_ex = 10;
+
+-- 4. Catégorie la plus travaillée dans tout le projet
+SELECT m.categorie, COUNT(*) AS nb_fois_ciblee
+FROM cibler c
+JOIN Muscles m ON c.id_muscle = m.id_muscle
+GROUP BY m.categorie
+ORDER BY nb_fois_ciblee DESC;

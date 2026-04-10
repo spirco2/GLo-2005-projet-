@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IronTrack — Mes Programmes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:      #0a0a0a;
+      --surface: #141414;
+      --surface2:#1c1c1c;
+      --border:  #252525;
+      --accent:  #ccff00;
+      --accent2: #a8d400;
+      --text:    #f0f0f0;
+      --muted:   #555;
+      --muted2:  #888;
+      --danger:  #ff4040;
+      --r:       10px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow:hidden}
+
+    /* NAV */
+    nav{display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:56px;background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+    .logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--accent);letter-spacing:1px}
+    .nav-links{display:flex;gap:1.75rem;list-style:none}
+    .nav-links a{color:var(--muted2);text-decoration:none;font-size:0.875rem;font-weight:500;transition:color .2s}
+    .nav-links a:hover{color:var(--text)}
+    .nav-links a.active{color:var(--accent)}
+    .nav-right{display:flex;gap:.6rem}
+    .btn{font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;padding:.4rem .9rem;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text);transition:all .2s}
+    .btn:hover{border-color:var(--accent);color:var(--accent)}
+    .btn.primary{background:var(--accent);color:#000;border-color:var(--accent)}
+    .btn.primary:hover{background:var(--accent2)}
+    .btn.danger:hover{border-color:var(--danger);color:var(--danger)}
+    .btn.ghost{border:1px dashed var(--border);color:var(--muted2)}
+    .btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+    /* LAYOUT 3 COLONNES */
+    .layout{display:grid;grid-template-columns:300px 1fr 360px;height:calc(100vh - 56px)}
+    .col{display:flex;flex-direction:column;border-right:1px solid var(--border);overflow:hidden}
+    .col:last-child{border-right:none}
+    .col-head{padding:1rem 1.25rem;border-bottom:1px solid var(--border);flex-shrink:0}
+    .col-title{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1px;color:var(--accent);margin-bottom:.75rem}
+    .col-body{flex:1;overflow-y:auto;padding:1rem}
+    .col-body::-webkit-scrollbar{width:3px}
+    .col-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+    .col-foot{padding:.75rem 1rem;border-top:1px solid var(--border);flex-shrink:0}
+
+    /* PROG CARDS */
+    .prog-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.9rem 1rem;margin-bottom:.6rem;cursor:pointer;transition:border-color .2s,background .2s;position:relative}
+    .prog-card:hover{border-color:#333}
+    .prog-card.active{border-color:var(--accent);background:rgba(204,255,0,.03)}
+    .prog-name{font-weight:700;font-size:.9rem;margin-bottom:.2rem;padding-right:3rem}
+    .prog-desc{font-size:.78rem;color:var(--muted2);margin-bottom:.5rem}
+    .prog-count{font-size:.72rem;color:var(--muted);margin-bottom:.5rem}
+    .prog-badge{position:absolute;top:.75rem;right:.75rem;font-size:.65rem;font-weight:700;padding:.15rem .45rem;border-radius:4px}
+    .badge-perso{background:rgba(204,255,0,.15);color:var(--accent)}
+    .badge-preset{background:rgba(100,100,100,.2);color:var(--muted2)}
+    .prog-actions{display:flex;gap:.35rem;flex-wrap:wrap}
+    .prog-exo-tags{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.5rem}
+    .prog-exo-tag{font-size:.68rem;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted2);padding:.1rem .4rem;border-radius:4px;display:flex;align-items:center;gap:.3rem}
+    .prog-exo-tag .rm{cursor:pointer;color:var(--muted);transition:color .2s}
+    .prog-exo-tag .rm:hover{color:var(--danger)}
+    .btn-xs{font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:600;padding:.2rem .55rem;border-radius:5px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted2);transition:all .2s}
+    .btn-xs:hover{border-color:var(--accent);color:var(--accent)}
+    .btn-xs.primary{background:var(--accent);color:#000;border-color:var(--accent)}
+    .btn-xs.primary:hover{background:var(--accent2)}
+    .btn-xs.danger:hover{border-color:var(--danger);color:var(--danger)}
+
+    /* SEARCH + FILTRES */
+    .search-wrap{position:relative;margin-bottom:.65rem}
+    .search-wrap input{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:.5rem .75rem .5rem 2rem;border-radius:8px;font-size:.85rem;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+    .search-wrap input:focus{border-color:var(--accent)}
+    .search-wrap input::placeholder{color:var(--muted)}
+    .search-icon{position:absolute;left:.65rem;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.85rem;pointer-events:none}
+    .chips{display:flex;flex-wrap:wrap;gap:.3rem}
+    .chip{font-size:.72rem;font-weight:600;padding:.2rem .6rem;border-radius:20px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted2);transition:all .2s;font-family:'DM Sans',sans-serif}
+    .chip:hover{border-color:#444;color:var(--text)}
+    .chip.on{background:var(--accent);border-color:var(--accent);color:#000}
+
+    /* EXO LIST */
+    .exo-item{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.65rem .9rem;margin-bottom:.4rem;transition:border-color .2s}
+    .exo-item:hover{border-color:#333}
+    .exo-item.in-prog{border-color:rgba(204,255,0,.3);background:rgba(204,255,0,.02)}
+    .exo-left{flex:1;min-width:0}
+    .exo-name{font-size:.85rem;font-weight:600;margin-bottom:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .exo-tags{display:flex;gap:.3rem;flex-wrap:wrap}
+    .tag{font-size:.68rem;font-weight:600;padding:.1rem .4rem;border-radius:4px}
+    .tag-m{background:rgba(204,255,0,.1);color:var(--accent)}
+    .tag-D{background:rgba(0,200,100,.1);color:#00c864}
+    .tag-I{background:rgba(255,165,0,.1);color:#ffa500}
+    .tag-A{background:rgba(255,64,64,.1);color:#ff4040}
+    .tag-E{background:rgba(150,0,255,.1);color:#9600ff}
+    .btn-plus{width:26px;height:26px;border-radius:6px;background:var(--accent);color:#000;border:none;font-size:1rem;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:.65rem;transition:background .2s,transform .15s}
+    .btn-plus:hover{background:var(--accent2);transform:scale(1.1)}
+    .btn-plus.remove{background:transparent;border:1px solid var(--border);color:var(--muted2);font-size:.8rem}
+    .btn-plus.remove:hover{background:rgba(255,64,64,.1);border-color:var(--danger);color:var(--danger);transform:none}
+
+    /* MODE BADGE */
+    .mode-bar{background:rgba(204,255,0,.08);border:1px solid rgba(204,255,0,.2);border-radius:8px;padding:.5rem .85rem;font-size:.8rem;color:var(--accent);font-weight:600;margin-bottom:.75rem;display:none;align-items:center;justify-content:space-between}
+    .mode-bar.show{display:flex}
+
+    /* SEANCE */
+    .seance-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.5rem}
+    .timer{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--accent);letter-spacing:2px;line-height:1}
+    .seance-prog{font-size:.78rem;color:var(--muted2);margin-top:.15rem}
+    .serie-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:.65rem;overflow:hidden}
+    .serie-block-head{display:flex;align-items:center;justify-content:space-between;padding:.65rem .85rem;border-bottom:1px solid var(--border);background:rgba(204,255,0,.02)}
+    .serie-exo-name{font-size:.88rem;font-weight:700}
+    .serie-muscle{font-size:.72rem;color:var(--accent);margin-top:.1rem}
+    .serie-rows{padding:.65rem .75rem;display:flex;flex-direction:column;gap:.4rem}
+    .col-labels{display:grid;grid-template-columns:22px 1fr 1fr 1fr 80px 22px;gap:.35rem;padding:0 .1rem;margin-bottom:.1rem}
+    .col-lbl{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;text-align:center}
+    .serie-row{display:grid;grid-template-columns:22px 1fr 1fr 1fr 80px 22px;gap:.35rem;align-items:center}
+    .snum{font-size:.72rem;color:var(--muted);font-weight:700;text-align:center}
+    .sinput{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:.32rem .4rem;border-radius:5px;font-size:.8rem;font-family:'DM Sans',sans-serif;text-align:center;outline:none;transition:border-color .2s;width:100%}
+    .sinput:focus{border-color:var(--accent)}
+    .sinput::placeholder{color:var(--muted);font-size:.72rem}
+    .sinput.err{border-color:var(--danger)!important}
+    .stype{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:.3rem .35rem;border-radius:5px;font-size:.75rem;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer;width:100%}
+    .stype:focus{border-color:var(--accent)}
+    .sdel{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:.85rem;line-height:1;transition:color .2s}
+    .sdel:hover{color:var(--danger)}
+    .btn-add-serie{width:100%;background:transparent;border:1px dashed var(--border);color:var(--muted);padding:.35rem;border-radius:5px;font-size:.78rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;margin-top:.2rem}
+    .btn-add-serie:hover{border-color:var(--accent);color:var(--accent)}
+    .empty{text-align:center;padding:2.5rem 1rem;color:var(--muted)}
+    .empty-ico{font-size:2rem;margin-bottom:.5rem}
+    .empty p{font-size:.83rem;line-height:1.5}
+
+    /* MODAL */
+    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:center;justify-content:center}
+    .overlay.open{display:flex}
+    .modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.75rem;width:400px;max-width:95vw}
+    .modal h2{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--accent);margin-bottom:1.25rem;letter-spacing:1px}
+    .field{margin-bottom:.9rem}
+    .field label{display:block;font-size:.75rem;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.35rem}
+    .field input,.field textarea{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:.55rem .75rem;border-radius:7px;font-size:.88rem;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+    .field input:focus,.field textarea:focus{border-color:var(--accent)}
+    .field input::placeholder,.field textarea::placeholder{color:var(--muted)}
+    .field textarea{resize:vertical;min-height:70px}
+    .field input.err{border-color:var(--danger)}
+    .err-msg{font-size:.75rem;color:var(--danger);margin-top:.3rem;display:none}
+    .modal-foot{display:flex;gap:.65rem;margin-top:1.25rem}
+    .modal-foot button{flex:1}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:1.75rem;right:1.75rem;background:var(--accent);color:#000;padding:.65rem 1.1rem;border-radius:9px;font-weight:700;font-size:.85rem;z-index:300;transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none}
+    .toast.show{transform:translateY(0);opacity:1}
+    .toast.warn{background:#ff9500}
+    .toast.err{background:var(--danger);color:#fff}
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="logo">IronTrack</span>
+  <ul class="nav-links">
+    <li><a href="#">Calculer IMC</a></li>
+    <li><a href="#">Muscles</a></li>
+    <li><a href="#">Exercices</a></li>
+    <li><a href="#" class="active">Mes Programmes</a></li>
+    <li><a href="#">Suivi</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="btn">Connexion</button>
+    <button class="btn primary">S'inscrire</button>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- COL 1 : MES PROGRAMMES -->
+  <div class="col">
+    <div class="col-head">
+      <div class="col-title">Mes Programmes</div>
+      <button class="btn ghost" style="width:100%" onclick="openModalCreate()">+ Nouveau programme</button>
+    </div>
+    <div class="col-body" id="prog-list"></div>
+  </div>
+
+  <!-- COL 2 : BIBLIOTHÈQUE -->
+  <div class="col">
+    <div class="col-head">
+      <div class="col-title">Bibliothèque d'exercices</div>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="Rechercher un exercice..." oninput="filterExos()"/>
+      </div>
+      <div class="chips" id="muscle-chips"></div>
+    </div>
+    <div class="col-body">
+      <div id="mode-bar" class="mode-bar">
+        <span id="mode-label">Mode édition programme</span>
+        <button class="btn-xs" onclick="quitterModeEdition()">✓ Terminé</button>
+      </div>
+      <div id="exo-list"></div>
+    </div>
+  </div>
+
+  <!-- COL 3 : SÉANCE -->
+  <div class="col">
+    <div class="col-head">
+      <div class="col-title">Séance en cours</div>
+      <div class="seance-top">
+        <div>
+          <div id="seance-prog-name" style="font-weight:700;font-size:.95rem">— Aucun programme</div>
+          <div class="seance-prog">Sélectionne un programme et démarre</div>
+        </div>
+        <div class="timer" id="timer">00:00</div>
+      </div>
+    </div>
+    <div class="col-body" id="seance-body">
+      <div class="empty">
+        <div class="empty-ico">🏋️</div>
+        <p>Démarre une séance depuis<br>un de tes programmes</p>
+      </div>
+    </div>
+    <div class="col-foot" style="display:flex;gap:.5rem">
+      <button class="btn danger" style="flex:0 0 auto" onclick="annulerSeance()">Annuler</button>
+      <button class="btn primary" style="flex:1" onclick="terminerSeance()">✓ Terminer la séance</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL CRÉER / MODIFIER PROGRAMME -->
+<div class="overlay" id="modal-prog">
+  <div class="modal">
+    <h2 id="modal-title">Nouveau Programme</h2>
+    <div class="field">
+      <label>Nom du programme *</label>
+      <input type="text" id="f-nom" placeholder="ex: Push Pull Legs" maxlength="100"/>
+      <div class="err-msg" id="err-nom">Le nom est obligatoire.</div>
+    </div>
+    <div class="field">
+      <label>Description</label>
+      <textarea id="f-desc" placeholder="Décris ton programme..."></textarea>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeModal()">Annuler</button>
+      <button class="btn primary" id="modal-save-btn" onclick="sauvegarderProgramme()">Créer</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DONNÉES — 100 exercices complets
+// ═══════════════════════════════════════════════════════════════
+const EXERCICES = [
+  {id:1,  nom:"Extension mollets debout (Haltère)",    eq:"Haltère",      diff:"Intermédiaire", muscles:["Mollets"]},
+  {id:2,  nom:"Curl Biceps 21",                        eq:"Barre",        diff:"Avancé",        muscles:["Biceps"]},
+  {id:3,  nom:"Ciseaux abdominaux",                    eq:"Aucun",        diff:"Débutant",      muscles:["Abdominaux","Obliques"]},
+  {id:4,  nom:"Roue abdominale",                       eq:"Autres",       diff:"Avancé",        muscles:["Abdominaux"]},
+  {id:5,  nom:"Arnold Press",                          eq:"Haltère",      diff:"Intermédiaire", muscles:["Épaules","Triceps"]},
+  {id:6,  nom:"Squat pistolet assisté",                eq:"Aucun",        diff:"Avancé",        muscles:["Quadriceps","Fessiers"]},
+  {id:7,  nom:"Hyperextension 45°",                    eq:"Machine",      diff:"Débutant",      muscles:["Lombaires"]},
+  {id:8,  nom:"Good Morning (Barre)",                  eq:"Barre",        diff:"Intermédiaire", muscles:["Lombaires","Ischio-jambiers"]},
+  {id:9,  nom:"Curl derrière le dos (Câble)",          eq:"Machine",      diff:"Intermédiaire", muscles:["Biceps"]},
+  {id:10, nom:"Développé couché (Barre)",              eq:"Barre",        diff:"Débutant",      muscles:["Pectoraux","Triceps"]},
+  {id:11, nom:"Développé couché (Smith)",              eq:"Machine",      diff:"Débutant",      muscles:["Pectoraux","Triceps"]},
+  {id:12, nom:"Curl biceps (Barre)",                   eq:"Barre",        diff:"Débutant",      muscles:["Biceps"]},
+  {id:13, nom:"Curl biceps (Câble)",                   eq:"Machine",      diff:"Débutant",      muscles:["Biceps"]},
+  {id:14, nom:"Curl biceps (Haltères)",                eq:"Haltère",      diff:"Débutant",      muscles:["Biceps"]},
+  {id:15, nom:"Curl biceps (Machine)",                 eq:"Machine",      diff:"Débutant",      muscles:["Biceps"]},
+  {id:16, nom:"Squat fendu bulgare",                   eq:"Haltère",      diff:"Intermédiaire", muscles:["Quadriceps","Fessiers"]},
+  {id:17, nom:"Burpee classique",                      eq:"Aucun",        diff:"Avancé",        muscles:["Full Body"]},
+  {id:18, nom:"Pec Deck",                              eq:"Machine",      diff:"Débutant",      muscles:["Pectoraux"]},
+  {id:19, nom:"Crunch à la poulie",                    eq:"Machine",      diff:"Intermédiaire", muscles:["Abdominaux"]},
+  {id:20, nom:"Écartés poulie haute",                  eq:"Machine",      diff:"Intermédiaire", muscles:["Pectoraux"]},
+  {id:21, nom:"Pull-through",                          eq:"Machine",      diff:"Intermédiaire", muscles:["Fessiers","Lombaires"]},
+  {id:22, nom:"Woodchopper (Câble)",                   eq:"Machine",      diff:"Intermédiaire", muscles:["Obliques"]},
+  {id:23, nom:"Dips larges",                           eq:"Poids corps",  diff:"Intermédiaire", muscles:["Pectoraux","Triceps"]},
+  {id:24, nom:"Dips assistés",                         eq:"Machine",      diff:"Débutant",      muscles:["Pectoraux","Triceps"]},
+  {id:25, nom:"Relevé de jambes suspendu",             eq:"Aucun",        diff:"Avancé",        muscles:["Abdominaux"]},
+  {id:26, nom:"Élévation genoux suspendu",             eq:"Aucun",        diff:"Intermédiaire", muscles:["Abdominaux"]},
+  {id:27, nom:"Relevé de jambes (Chaise romaine)",     eq:"Machine",      diff:"Débutant",      muscles:["Abdominaux"]},
+  {id:28, nom:"Crunch vélo",                           eq:"Aucun",        diff:"Débutant",      muscles:["Abdominaux","Obliques"]},
+  {id:29, nom:"Flexion latérale haltère",              eq:"Haltère",      diff:"Débutant",      muscles:["Obliques"]},
+  {id:30, nom:"Russian Twist",                         eq:"Aucun",        diff:"Intermédiaire", muscles:["Obliques"]},
+  {id:31, nom:"Planche latérale",                      eq:"Aucun",        diff:"Débutant",      muscles:["Obliques"]},
+  {id:32, nom:"Windshield Wipers",                     eq:"Barre",        diff:"Avancé",        muscles:["Obliques","Abdominaux"]},
+  {id:33, nom:"Twist russe (Pondéré)",                 eq:"Haltère",      diff:"Intermédiaire", muscles:["Obliques"]},
+  {id:34, nom:"Gainage oblique (Côté)",                eq:"Aucun",        diff:"Débutant",      muscles:["Obliques"]},
+  {id:35, nom:"Développé militaire",                   eq:"Haltère",      diff:"Intermédiaire", muscles:["Épaules","Triceps"]},
+  {id:36, nom:"Élévation latérale machine",            eq:"Machine",      diff:"Débutant",      muscles:["Épaules"]},
+  {id:37, nom:"Élévation latérale haltères",           eq:"Haltère",      diff:"Débutant",      muscles:["Épaules"]},
+  {id:38, nom:"Arnold Press assis",                    eq:"Haltère",      diff:"Intermédiaire", muscles:["Épaules","Triceps"]},
+  {id:39, nom:"Élévation latérale assise",             eq:"Haltère",      diff:"Intermédiaire", muscles:["Épaules"]},
+  {id:40, nom:"Élévation latérale poulie",             eq:"Machine",      diff:"Intermédiaire", muscles:["Épaules"]},
+  {id:41, nom:"Face Pull (Corde)",                     eq:"Machine",      diff:"Intermédiaire", muscles:["Épaules","Trapèzes"]},
+  {id:42, nom:"Développé militaire Smith Machine",     eq:"Machine",      diff:"Débutant",      muscles:["Épaules","Triceps"]},
+  {id:43, nom:"EZ Bar Curl",                           eq:"Barre",        diff:"Débutant",      muscles:["Biceps"]},
+  {id:44, nom:"Curl Concentration",                    eq:"Haltère",      diff:"Débutant",      muscles:["Biceps"]},
+  {id:45, nom:"Développé couché serré",                eq:"Barre",        diff:"Intermédiaire", muscles:["Triceps","Pectoraux"]},
+  {id:46, nom:"Pompe diamant",                         eq:"Aucun",        diff:"Avancé",        muscles:["Triceps","Pectoraux"]},
+  {id:47, nom:"Extension triceps poulie",              eq:"Machine",      diff:"Intermédiaire", muscles:["Triceps"]},
+  {id:48, nom:"Dips machine assis",                    eq:"Machine",      diff:"Débutant",      muscles:["Triceps"]},
+  {id:49, nom:"Extension triceps haltère",             eq:"Haltère",      diff:"Débutant",      muscles:["Triceps"]},
+  {id:50, nom:"Dips assistés triceps",                 eq:"Machine",      diff:"Débutant",      muscles:["Triceps"]},
+  {id:51, nom:"Triceps Pressdown",                     eq:"Machine",      diff:"Débutant",      muscles:["Triceps"]},
+  {id:52, nom:"Curl poignet (Barre)",                  eq:"Barre",        diff:"Intermédiaire", muscles:["Avant-bras"]},
+  {id:53, nom:"Curl poignet (Haltères)",               eq:"Haltère",      diff:"Débutant",      muscles:["Avant-bras"]},
+  {id:54, nom:"Wrist Roller",                          eq:"Autres",       diff:"Intermédiaire", muscles:["Avant-bras"]},
+  {id:55, nom:"Fente latérale",                        eq:"Aucun",        diff:"Débutant",      muscles:["Quadriceps","Fessiers","Adducteurs"]},
+  {id:56, nom:"Leg Extension",                         eq:"Machine",      diff:"Débutant",      muscles:["Quadriceps"]},
+  {id:57, nom:"Fente inversée barre",                  eq:"Barre",        diff:"Intermédiaire", muscles:["Quadriceps","Fessiers"]},
+  {id:58, nom:"SDT Roumain Barre",                     eq:"Barre",        diff:"Intermédiaire", muscles:["Ischio-jambiers","Lombaires"]},
+  {id:59, nom:"SDT Roumain Haltères",                  eq:"Haltère",      diff:"Intermédiaire", muscles:["Ischio-jambiers","Fessiers"]},
+  {id:60, nom:"Abducteurs machine",                    eq:"Machine",      diff:"Débutant",      muscles:["Abducteurs"]},
+  {id:61, nom:"Adducteurs machine",                    eq:"Machine",      diff:"Débutant",      muscles:["Adducteurs"]},
+  {id:62, nom:"Chin Up",                               eq:"Aucun",        diff:"Intermédiaire", muscles:["Dos","Biceps"]},
+  {id:63, nom:"Chin Up assisté",                       eq:"Machine",      diff:"Débutant",      muscles:["Dos","Biceps"]},
+  {id:64, nom:"Rowing bûcheron",                       eq:"Haltère",      diff:"Intermédiaire", muscles:["Dos","Biceps"]},
+  {id:65, nom:"Tirage poitrine bande",                 eq:"Autres",       diff:"Débutant",      muscles:["Dos"]},
+  {id:66, nom:"Tirage poitrine poulie",                eq:"Machine",      diff:"Débutant",      muscles:["Dos","Biceps"]},
+  {id:67, nom:"Traction négative",                     eq:"Aucun",        diff:"Intermédiaire", muscles:["Dos"]},
+  {id:68, nom:"Traction classique",                    eq:"Aucun",        diff:"Avancé",        muscles:["Dos","Épaules"]},
+  {id:69, nom:"Traction prise large",                  eq:"Aucun",        diff:"Avancé",        muscles:["Dos","Épaules"]},
+  {id:70, nom:"Rowing assis large",                    eq:"Machine",      diff:"Intermédiaire", muscles:["Dos","Trapèzes"]},
+  {id:71, nom:"Rowing assis V-Grip",                   eq:"Machine",      diff:"Débutant",      muscles:["Dos"]},
+  {id:72, nom:"Rowing unilatéral poulie",              eq:"Machine",      diff:"Intermédiaire", muscles:["Dos"]},
+  {id:73, nom:"Superman Hold",                         eq:"Aucun",        diff:"Débutant",      muscles:["Lombaires"]},
+  {id:74, nom:"Banc à lombaires",                      eq:"Machine",      diff:"Débutant",      muscles:["Lombaires"]},
+  {id:75, nom:"Soulevé de terre",                      eq:"Barre",        diff:"Avancé",        muscles:["Lombaires","Fessiers"]},
+  {id:76, nom:"Trap Bar Deadlift",                     eq:"Barre",        diff:"Intermédiaire", muscles:["Lombaires","Quadriceps"]},
+  {id:77, nom:"Frog Pumps",                            eq:"Aucun",        diff:"Débutant",      muscles:["Fessiers"]},
+  {id:78, nom:"Élévation latérale jambe",              eq:"Aucun",        diff:"Débutant",      muscles:["Abducteurs"]},
+  {id:79, nom:"Hip Thrust Machine",                    eq:"Machine",      diff:"Intermédiaire", muscles:["Fessiers"]},
+  {id:80, nom:"Front Lever Hold",                      eq:"Aucun",        diff:"Expert",        muscles:["Dos","Abdominaux"]},
+  {id:81, nom:"Front Lever Raise",                     eq:"Aucun",        diff:"Expert",        muscles:["Dos","Abdominaux"]},
+  {id:82, nom:"Muscle Up",                             eq:"Aucun",        diff:"Expert",        muscles:["Dos","Triceps"]},
+  {id:83, nom:"Wall Ball",                             eq:"Autres",       diff:"Intermédiaire", muscles:["Full Body"]},
+  {id:84, nom:"Air Bike (Assault)",                    eq:"Machine",      diff:"Intermédiaire", muscles:["Cardio"]},
+  {id:85, nom:"Battle Ropes",                          eq:"Autres",       diff:"Intermédiaire", muscles:["Cardio"]},
+  {id:86, nom:"Boxe (Sac de frappe)",                  eq:"Autres",       diff:"Débutant",      muscles:["Cardio"]},
+  {id:87, nom:"Vélo elliptique",                       eq:"Machine",      diff:"Débutant",      muscles:["Cardio"]},
+  {id:88, nom:"Corde à sauter",                        eq:"Autres",       diff:"Débutant",      muscles:["Cardio"]},
+  {id:89, nom:"Rameur Concept2",                       eq:"Machine",      diff:"Intermédiaire", muscles:["Cardio","Dos"]},
+  {id:90, nom:"Spinning",                              eq:"Machine",      diff:"Intermédiaire", muscles:["Cardio"]},
+  {id:91, nom:"Course sur tapis",                      eq:"Machine",      diff:"Débutant",      muscles:["Cardio"]},
+  {id:92, nom:"HSPU (Handstand)",                      eq:"Aucun",        diff:"Expert",        muscles:["Épaules","Triceps"]},
+  {id:93, nom:"Pike Pushup",                           eq:"Aucun",        diff:"Intermédiaire", muscles:["Épaules"]},
+  {id:94, nom:"Fente sautée",                          eq:"Aucun",        diff:"Avancé",        muscles:["Quadriceps","Cardio"]},
+  {id:95, nom:"Fente marchée",                         eq:"Aucun",        diff:"Débutant",      muscles:["Quadriceps","Fessiers"]},
+  {id:96, nom:"Extension mollet 1 jambe",              eq:"Aucun",        diff:"Débutant",      muscles:["Mollets"]},
+  {id:97, nom:"Burpee over barbell",                   eq:"Barre",        diff:"Avancé",        muscles:["Full Body"]},
+  {id:98, nom:"Stairmaster",                           eq:"Machine",      diff:"Intermédiaire", muscles:["Cardio"]},
+  {id:99, nom:"Shrugs (Haltères)",                     eq:"Haltère",      diff:"Débutant",      muscles:["Trapèzes"]},
+  {id:100,nom:"Tirage menton (Barre)",                 eq:"Barre",        diff:"Intermédiaire", muscles:["Trapèzes","Épaules"]},
+];
+
+const MUSCLES = [...new Set(EXERCICES.flatMap(e=>e.muscles))].sort();
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let programmes = [
+  {id:1, nom:"Full Body Débutant",  desc:"Mouvements polyarticulaires de base.", custom:false,
+   exoIds:[10,75,56,35,12,7]},
+  {id:2, nom:"Push Pull Legs",      desc:"Organisation par chaîne musculaire.",  custom:false,
+   exoIds:[10,35,45,68,64,62,75,56,12]},
+  {id:3, nom:"Mon programme 💪",    desc:"Programme personnalisé.",               custom:true,
+   exoIds:[]},
+];
+
+let progActif      = null;   // programme sélectionné
+let modeEdition    = null;   // id du prog en mode "ajouter exercices"
+let seanceActive   = false;
+let seanceExos     = [];     // [{exo, series:[...]}]
+let filterMuscle   = '';
+let timerInterval  = null;
+let timerSec       = 0;
+let editProgId     = null;   // pour modal modifier
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+window.onload = () => { renderChips(); renderExos(); renderProgs(); };
+
+// ═══════════════════════════════════════════════════════════════
+// CHIPS
+// ═══════════════════════════════════════════════════════════════
+function renderChips() {
+  const c = document.getElementById('muscle-chips');
+  c.innerHTML = `<button class="chip on" onclick="setMuscle(this,'')">Tous</button>`;
+  MUSCLES.forEach(m => {
+    c.innerHTML += `<button class="chip" onclick="setMuscle(this,'${m}')">${m}</button>`;
+  });
+}
+function setMuscle(el, m) {
+  filterMuscle = m;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  filterExos();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EXERCICES
+// ═══════════════════════════════════════════════════════════════
+function filterExos() {
+  const q = document.getElementById('search-input').value.toLowerCase().trim();
+  const list = EXERCICES.filter(e => {
+    const okM = !filterMuscle || e.muscles.includes(filterMuscle);
+    const okQ = !q || e.nom.toLowerCase().includes(q);
+    return okM && okQ;
+  });
+  renderExos(list);
+}
+
+function renderExos(list = EXERCICES) {
+  const cont = document.getElementById('exo-list');
+  // IDs du programme en mode édition (pour marquer les déjà ajoutés)
+  const inProgIds = modeEdition
+    ? (programmes.find(p=>p.id===modeEdition)?.exoIds || [])
+    : (seanceActive ? seanceExos.map(s=>s.exo.id) : []);
+
+  if (!list.length) {
+    cont.innerHTML = `<div class="empty"><div class="empty-ico">🔍</div><p>Aucun exercice trouvé</p></div>`;
+    return;
+  }
+  cont.innerHTML = list.map(e => {
+    const inProg = inProgIds.includes(e.id);
+    const diffClass = {Débutant:'D',Intermédiaire:'I',Avancé:'A',Expert:'E'}[e.diff] || 'D';
+    return `
+      <div class="exo-item ${inProg?'in-prog':''}">
+        <div class="exo-left">
+          <div class="exo-name">${e.nom}</div>
+          <div class="exo-tags">
+            ${e.muscles.map(m=>`<span class="tag tag-m">${m}</span>`).join('')}
+            <span class="tag tag-${diffClass}">${e.diff}</span>
+          </div>
+        </div>
+        ${inProg
+          ? `<button class="btn-plus remove" onclick="retirerExo(${e.id})" title="Retirer">✕</button>`
+          : `<button class="btn-plus" onclick="ajouterExo(${e.id})" title="Ajouter">+</button>`
+        }
+      </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PROGRAMMES — render
+// ═══════════════════════════════════════════════════════════════
+function renderProgs() {
+  const cont = document.getElementById('prog-list');
+  cont.innerHTML = programmes.map(p => {
+    const exos = p.exoIds.map(id=>EXERCICES.find(e=>e.id===id)).filter(Boolean);
+    const isActive = progActif?.id === p.id;
+    const isEditing = modeEdition === p.id;
+    return `
+      <div class="prog-card ${isActive?'active':''}" onclick="selectProg(${p.id})">
+        <span class="prog-badge ${p.custom?'badge-perso':'badge-preset'}">${p.custom?'PERSO':'PRESET'}</span>
+        <div class="prog-name">${p.nom}</div>
+        <div class="prog-desc">${p.desc||'Aucune description'}</div>
+        <div class="prog-count">${exos.length} exercice${exos.length!==1?'s':''}</div>
+        <div class="prog-actions">
+          <button class="btn-xs primary" onclick="event.stopPropagation();demarrerSeance(${p.id})">▶ Démarrer</button>
+          ${p.custom ? `
+            <button class="btn-xs ${isEditing?'primary':''}" onclick="event.stopPropagation();toggleModeEdition(${p.id})">
+              ${isEditing?'✓ Terminé':'✏ Modifier'}
+            </button>
+            <button class="btn-xs" onclick="event.stopPropagation();openModalEdit(${p.id})">Renommer</button>
+            <button class="btn-xs danger" onclick="event.stopPropagation();supprimerProg(${p.id})">Supprimer</button>
+          ` : ''}
+        </div>
+        ${exos.length ? `
+          <div class="prog-exo-tags">
+            ${exos.map(e=>`
+              <span class="prog-exo-tag">
+                ${e.nom}
+                ${p.custom?`<span class="rm" onclick="event.stopPropagation();retirerExoDuProg(${p.id},${e.id})">✕</span>`:''}
+              </span>`).join('')}
+          </div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function selectProg(id) {
+  progActif = programmes.find(p=>p.id===id);
+  if (modeEdition && modeEdition !== id) quitterModeEdition();
+  renderProgs();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MODE ÉDITION PROGRAMME
+// ═══════════════════════════════════════════════════════════════
+function toggleModeEdition(progId) {
+  if (modeEdition === progId) {
+    quitterModeEdition();
+  } else {
+    modeEdition = progId;
+    progActif = programmes.find(p=>p.id===progId);
+    const bar = document.getElementById('mode-bar');
+    const prog = programmes.find(p=>p.id===progId);
+    document.getElementById('mode-label').textContent = `Édition : ${prog.nom} — clique + pour ajouter`;
+    bar.classList.add('show');
+    renderProgs();
+    renderExos();
+    showToast('Clique + pour ajouter des exercices au programme');
+  }
+}
+
+function quitterModeEdition() {
+  modeEdition = null;
+  document.getElementById('mode-bar').classList.remove('show');
+  renderProgs();
+  renderExos();
+  showToast('Programme sauvegardé ✓');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AJOUTER / RETIRER EXERCICE
+// ═══════════════════════════════════════════════════════════════
+function ajouterExo(id) {
+  // MODE 1 : édition programme perso
+  if (modeEdition) {
+    const prog = programmes.find(p=>p.id===modeEdition);
+    if (!prog) return;
+    if (prog.exoIds.includes(id)) { showToast('Déjà dans le programme','warn'); return; }
+    prog.exoIds.push(id);
+    renderProgs();
+    renderExos();
+    const exo = EXERCICES.find(e=>e.id===id);
+    showToast(`${exo.nom} ajouté au programme !`);
+    return;
+  }
+  // MODE 2 : séance active
+  if (seanceActive) {
+    const exo = EXERCICES.find(e=>e.id===id);
+    if (seanceExos.find(s=>s.exo.id===id)) { showToast('Déjà dans la séance','warn'); return; }
+    seanceExos.push({exo, series:[{poids:'',reps:'',rpe:'',type:'normale'}]});
+    renderSeance();
+    renderExos();
+    showToast(`${exo.nom} ajouté à la séance !`);
+    return;
+  }
+  showToast('Démarre une séance ou active le mode édition','warn');
+}
+
+function retirerExo(id) {
+  if (modeEdition) {
+    retirerExoDuProg(modeEdition, id);
+  } else if (seanceActive) {
+    seanceExos = seanceExos.filter(s=>s.exo.id!==id);
+    renderSeance();
+    renderExos();
+  }
+}
+
+function retirerExoDuProg(progId, exoId) {
+  const prog = programmes.find(p=>p.id===progId);
+  if (prog) {
+    prog.exoIds = prog.exoIds.filter(id=>id!==exoId);
+    renderProgs();
+    renderExos();
+    showToast('Exercice retiré');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MODAL CRÉER / MODIFIER
+// ═══════════════════════════════════════════════════════════════
+function openModalCreate() {
+  editProgId = null;
+  document.getElementById('modal-title').textContent = 'Nouveau Programme';
+  document.getElementById('modal-save-btn').textContent = 'Créer';
+  document.getElementById('f-nom').value = '';
+  document.getElementById('f-desc').value = '';
+  document.getElementById('err-nom').style.display = 'none';
+  document.getElementById('f-nom').classList.remove('err');
+  document.getElementById('modal-prog').classList.add('open');
+  setTimeout(()=>document.getElementById('f-nom').focus(), 100);
+}
+
+function openModalEdit(progId) {
+  editProgId = progId;
+  const prog = programmes.find(p=>p.id===progId);
+  document.getElementById('modal-title').textContent = 'Modifier le programme';
+  document.getElementById('modal-save-btn').textContent = 'Enregistrer';
+  document.getElementById('f-nom').value = prog.nom;
+  document.getElementById('f-desc').value = prog.desc || '';
+  document.getElementById('err-nom').style.display = 'none';
+  document.getElementById('f-nom').classList.remove('err');
+  document.getElementById('modal-prog').classList.add('open');
+  setTimeout(()=>document.getElementById('f-nom').focus(), 100);
+}
+
+function closeModal() {
+  document.getElementById('modal-prog').classList.remove('open');
+}
+
+function sauvegarderProgramme() {
+  const nom  = document.getElementById('f-nom').value.trim();
+  const desc = document.getElementById('f-desc').value.trim();
+  const errEl = document.getElementById('err-nom');
+  // Validation
+  if (!nom) {
+    document.getElementById('f-nom').classList.add('err');
+    errEl.style.display = 'block';
+    return;
+  }
+  document.getElementById('f-nom').classList.remove('err');
+  errEl.style.display = 'none';
+
+  if (editProgId) {
+    // Modifier programme existant
+    const prog = programmes.find(p=>p.id===editProgId);
+    if (prog) { prog.nom = nom; prog.desc = desc; }
+    showToast('Programme mis à jour ✓');
+  } else {
+    // Créer nouveau programme
+    programmes.push({id:Date.now(), nom, desc, custom:true, exoIds:[]});
+    showToast('Programme créé !');
+  }
+  closeModal();
+  renderProgs();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SUPPRIMER PROGRAMME
+// ═══════════════════════════════════════════════════════════════
+function supprimerProg(id) {
+  if (!confirm('Supprimer ce programme définitivement ?')) return;
+  programmes = programmes.filter(p=>p.id!==id);
+  if (progActif?.id===id) progActif=null;
+  if (modeEdition===id) quitterModeEdition();
+  renderProgs();
+  showToast('Programme supprimé');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SÉANCE
+// ═══════════════════════════════════════════════════════════════
+function demarrerSeance(progId) {
+  quitterModeEdition();
+  const prog = programmes.find(p=>p.id===progId);
+  progActif = prog;
+  seanceActive = true;
+  seanceExos = prog.exoIds
+    .map(id=>EXERCICES.find(e=>e.id===id))
+    .filter(Boolean)
+    .map(exo=>({exo, series:[{poids:'',reps:'',rpe:'',type:'normale'}]}));
+  timerSec = 0;
+  clearInterval(timerInterval);
+  timerInterval = setInterval(()=>{
+    timerSec++;
+    const m=String(Math.floor(timerSec/60)).padStart(2,'0');
+    const s=String(timerSec%60).padStart(2,'0');
+    document.getElementById('timer').textContent=`${m}:${s}`;
+  },1000);
+  document.getElementById('seance-prog-name').textContent = prog.nom;
+  renderProgs();
+  renderSeance();
+  renderExos();
+  showToast(`Séance "${prog.nom}" démarrée !`);
+}
+
+function ajouterSerie(exoId) {
+  const b = seanceExos.find(s=>s.exo.id===exoId);
+  if (b) b.series.push({poids:'',reps:'',rpe:'',type:'normale'});
+  renderSeance();
+}
+
+function supprimerSerie(exoId,idx) {
+  const b = seanceExos.find(s=>s.exo.id===exoId);
+  if (b && b.series.length>1) b.series.splice(idx,1);
+  renderSeance();
+}
+
+function updateSerie(exoId,idx,field,val) {
+  const b = seanceExos.find(s=>s.exo.id===exoId);
+  if (b) b.series[idx][field]=val;
+}
+
+function renderSeance() {
+  const cont = document.getElementById('seance-body');
+  if (!seanceActive || !seanceExos.length) {
+    cont.innerHTML = `<div class="empty"><div class="empty-ico">${seanceActive?'➕':'🏋️'}</div><p>${seanceActive?'Ajoute des exercices depuis la bibliothèque':'Démarre une séance depuis un de tes programmes'}</p></div>`;
+    return;
+  }
+  cont.innerHTML = seanceExos.map(({exo,series})=>`
+    <div class="serie-block">
+      <div class="serie-block-head">
+        <div>
+          <div class="serie-exo-name">${exo.nom}</div>
+          <div class="serie-muscle">${exo.muscles.join(' · ')}</div>
+        </div>
+      </div>
+      <div class="serie-rows">
+        <div class="col-labels">
+          <span class="col-lbl">#</span>
+          <span class="col-lbl">kg</span>
+          <span class="col-lbl">Reps</span>
+          <span class="col-lbl">RPE</span>
+          <span class="col-lbl">Type</span>
+          <span class="col-lbl"></span>
+        </div>
+        ${series.map((s,i)=>`
+          <div class="serie-row">
+            <span class="snum">${i+1}</span>
+            <input class="sinput" type="number" min="0" step="0.5" placeholder="0" value="${s.poids}"
+              onchange="updateSerie(${exo.id},${i},'poids',this.value)" oninput="val(this,0,999)"/>
+            <input class="sinput" type="number" min="1" max="100" placeholder="0" value="${s.reps}"
+              onchange="updateSerie(${exo.id},${i},'reps',this.value)" oninput="val(this,1,100)"/>
+            <input class="sinput" type="number" min="1" max="10" step="0.5" placeholder="—" value="${s.rpe}"
+              onchange="updateSerie(${exo.id},${i},'rpe',this.value)" oninput="val(this,1,10)"/>
+            <select class="stype" onchange="updateSerie(${exo.id},${i},'type',this.value)">
+              <option ${s.type==='normale'?'selected':''}>normale</option>
+              <option ${s.type==='warmup'?'selected':''}>warmup</option>
+              <option ${s.type==='drop'?'selected':''}>drop</option>
+              <option ${s.type==='echec'?'selected':''}>echec</option>
+            </select>
+            <button class="sdel" onclick="supprimerSerie(${exo.id},${i})">✕</button>
+          </div>`).join('')}
+        <button class="btn-add-serie" onclick="ajouterSerie(${exo.id})">+ Série</button>
+      </div>
+    </div>`).join('');
+}
+
+// VALIDATION INPUTS
+function val(input, min, max) {
+  const v = parseFloat(input.value);
+  if (input.value!=='' && (isNaN(v)||v<min||v>max)) {
+    input.classList.add('err');
+    input.title=`Valeur entre ${min} et ${max}`;
+  } else {
+    input.classList.remove('err');
+    input.title='';
+  }
+}
+
+function terminerSeance() {
+  if (!seanceActive) { showToast('Aucune séance en cours','warn'); return; }
+  if (!seanceExos.length) { showToast('Ajoute au moins un exercice','warn'); return; }
+  let ok = true;
+  seanceExos.forEach(({series})=>series.forEach(s=>{if(!s.poids||!s.reps)ok=false;}));
+  if (!ok) { showToast('⚠️ Remplis tous les poids et reps','warn'); return; }
+  clearInterval(timerInterval);
+  seanceActive = false;
+  seanceExos = [];
+  timerSec = 0;
+  document.getElementById('timer').textContent = '00:00';
+  document.getElementById('seance-prog-name').textContent = '— Aucun programme';
+  renderSeance();
+  renderExos();
+  showToast('✅ Séance enregistrée !');
+}
+
+function annulerSeance() {
+  if (!seanceActive) return;
+  if (!confirm('Annuler la séance en cours ?')) return;
+  clearInterval(timerInterval);
+  seanceActive = false;
+  seanceExos = [];
+  timerSec = 0;
+  document.getElementById('timer').textContent = '00:00';
+  document.getElementById('seance-prog-name').textContent = '— Aucun programme';
+  renderSeance();
+  renderExos();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════
+let toastTimer;
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type?' '+type:'');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2800);
+}
+
+// Fermer modal en cliquant dehors
+document.getElementById('modal-prog').addEventListener('click', function(e){
+  if(e.target===this) closeModal();
+});
+
+// Enter dans le champ nom
+document.getElementById('f-nom').addEventListener('keydown', e=>{
+  if(e.key==='Enter') sauvegarderProgramme();
+});
+</script>
+</body>
+</html>

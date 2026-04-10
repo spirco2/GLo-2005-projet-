@@ -185,3 +185,21 @@ CALL calculer_volume_seance(1);
 
 -- Étape 4 : vérifier que volume_total a été mis à jour
 SELECT id_seance, id_user, volume_total FROM seance WHERE id_seance = 1;
+
+
+-- 1. Index sur l'équipement
+-- Justification : Crucial pour la procédure calculer_volume_seance (clause CASE e.equipement).
+CREATE INDEX idx_exercice_equipement ON exercice(equipement);
+
+-- 2. Index sur le nom de l'exercice
+-- Justification : Accélère les recherches textuelles dans l'interface utilisateur.
+CREATE INDEX idx_exercice_nom ON exercice(nom);
+
+-- 3. Index sur la difficulté
+-- Justification : Optimise le filtrage du catalogue (ex: afficher uniquement les exercices 'Débutant').
+CREATE INDEX idx_exercice_difficulte ON exercice(difficulte);
+
+-- 4. Index sur id_muscle (Table de liaison)
+-- Justification : La PK est (id_ex, id_muscle). Un index inverse sur id_muscle est
+-- nécessaire pour trouver rapidement tous les exercices ciblant un muscle précis.
+CREATE INDEX idx_cibler_muscle ON cibler(id_muscle);

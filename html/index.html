@@ -54,7 +54,7 @@
     .nav-links a { text-decoration: none; color: var(--muted); font-size: .88rem; font-weight: 500; transition: color .2s; }
     .nav-links a:hover, .nav-links a.active { color: var(--text); }
 
-    .nav-right { display: flex; gap: .7rem; }
+    .nav-right { display: flex; gap: .7rem; align-items: center; }
 
     .btn { padding: .5rem 1.1rem; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: .85rem; font-weight: 600; cursor: pointer; border: none; transition: all .2s; }
     .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
@@ -62,6 +62,19 @@
     .btn-accent { background: var(--accent); color: #111; }
     .btn-accent:hover { background: #d4eb30; }
     .btn-lg { padding: .75rem 1.8rem; font-size: .95rem; }
+
+    .nav-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #111;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: .8rem;
+      flex-shrink: 0;
+    }
 
     /* HERO */
     .hero {
@@ -248,10 +261,54 @@
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
     .btn-submit { width: 100%; padding: .78rem; font-size: .92rem; margin-top: .4rem; border-radius: 8px; }
 
+    /* FLASH */
+    .flash-container {
+      position: fixed;
+      top: 4.5rem;
+      right: 1.5rem;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+      max-width: 360px;
+    }
+
+    .flash {
+      padding: .75rem 1.1rem;
+      border-radius: 8px;
+      font-size: .85rem;
+      font-weight: 500;
+      border: 1px solid transparent;
+      animation: slideIn .25s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .flash-success { background: rgba(74,222,128,.12); border-color: rgba(74,222,128,.3); color: var(--green); }
+    .flash-error   { background: rgba(248,113,113,.12); border-color: rgba(248,113,113,.3); color: var(--red); }
+
+    /* CONNEXION MODAL */
+    .login-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center}
+    .login-overlay.open{display:flex}
+
     footer { text-align: center; padding: 2rem; font-size: .75rem; color: var(--muted); border-top: 1px solid var(--border); margin-top: 2rem; }
   </style>
 </head>
 <body>
+
+<!-- FLASH MESSAGES -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="flash-container">
+    {% for category, message in messages %}
+      <div class="flash flash-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endwith %}
 
 <!-- NAV -->
 <nav>
@@ -261,11 +318,20 @@
     <li><a href="#muscles">Muscles</a></li>
     <li><a href="#exercices">Exercices</a></li>
     <li><a href="#programmes">Programmes</a></li>
-    <li><a href="#inscription">Inscription</a></li>
+    {% if session.get('user_id') %}
+      <li><a href="/programmes">Mes Programmes</a></li>
+      <li><a href="/stats">Suivi</a></li>
+    {% endif %}
   </ul>
   <div class="nav-right">
-    <button class="btn btn-ghost">Connexion</button>
-    <button class="btn btn-accent">S'inscrire</button>
+    {% if session.get('user_id') %}
+      <div class="nav-avatar">{{ session.get('pseudo', '??')[:2]|upper }}</div>
+      <a href="/securite" class="btn btn-ghost" style="text-decoration:none">Mon compte</a>
+      <a href="/deconnexion" class="btn btn-ghost" style="text-decoration:none">Déconnexion</a>
+    {% else %}
+      <button class="btn btn-ghost" onclick="document.getElementById('login-overlay').classList.add('open')">Connexion</button>
+      <a href="#inscription" class="btn btn-accent" style="text-decoration:none">S'inscrire</a>
+    {% endif %}
   </div>
 </nav>
 
@@ -274,8 +340,13 @@
   <h1>Suivez votre<br><span>entraînement</span></h1>
   <p>Calculez votre IMC, explorez les exercices et suivez vos séances. Connectez-vous pour sauvegarder votre progression.</p>
   <div class="hero-btns">
-    <button class="btn btn-accent btn-lg">Commencer</button>
-    <button class="btn btn-ghost btn-lg">Explorer</button>
+    {% if session.get('user_id') %}
+      <a href="/programmes" class="btn btn-accent btn-lg" style="text-decoration:none">Mes Programmes</a>
+      <a href="/stats" class="btn btn-ghost btn-lg" style="text-decoration:none">Mon Suivi</a>
+    {% else %}
+      <a href="#inscription" class="btn btn-accent btn-lg" style="text-decoration:none">Commencer</a>
+      <a href="#exercices" class="btn btn-ghost btn-lg" style="text-decoration:none">Explorer</a>
+    {% endif %}
   </div>
   <div class="hero-note">Pas besoin de compte pour calculer votre IMC 👇</div>
 </div>
@@ -302,174 +373,163 @@
         <div class="imc-number" id="imc-val">—</div>
       </div>
       <div class="imc-cat" id="imc-cat">—</div>
-      <button class="btn btn-ghost" style="font-size:.78rem">Connexion pour sauvegarder →</button>
+      {% if session.get('user_id') %}
+        <span class="btn btn-ghost" style="font-size:.78rem;opacity:.5;cursor:default">IMC sauvegardé ✓</span>
+      {% else %}
+        <button class="btn btn-ghost" style="font-size:.78rem" onclick="document.getElementById('login-overlay').classList.add('open')">Connexion pour sauvegarder →</button>
+      {% endif %}
     </div>
   </div>
 </div>
 
 <hr class="div"/>
 
-<!-- MUSCLES — tirés de muscle.sql -->
+<!-- MUSCLES — dynamiques depuis la BD -->
 <div class="section" id="muscles">
   <div class="section-title">Groupes musculaires</div>
   <div class="section-sub">20 muscles · 8 catégories — tirés de la table Muscles</div>
   <div class="muscles-grid">
-    <div class="muscle-pill"><span class="muscle-pill-icon">🔵</span><div><div class="muscle-pill-name">Dos</div><div class="muscle-pill-count">Grand dorsal · Trapèzes · Lombaires</div></div></div>
-    <div class="muscle-pill"><span class="muscle-pill-icon">🟡</span><div><div class="muscle-pill-name">Poitrine</div><div class="muscle-pill-count">Pectoraux sup. · Pectoraux inf.</div></div></div>
-    <div class="muscle-pill"><span class="muscle-pill-icon">🟣</span><div><div class="muscle-pill-name">Épaules</div><div class="muscle-pill-count">Deltoïdes ant. · Deltoïdes lat.</div></div></div>
-    <div class="muscle-pill"><span class="muscle-pill-icon">🟢</span><div><div class="muscle-pill-name">Bras</div><div class="muscle-pill-count">Biceps · Triceps · Avant-bras</div></div></div>
-    <div class="muscle-pill"><span class="muscle-pill-icon">⚪</span><div><div class="muscle-pill-name">Core</div><div class="muscle-pill-count">Abdominaux · Obliques</div></div></div>
-    <div class="muscle-pill"><span class="muscle-pill-icon">🟠</span><div><div class="muscle-pill-name">Jambes</div><div class="muscle-pill-count">Quadriceps · Ischio · Fessiers · Adducteurs</div></div></div>
-    <div class="muscle-pill"><span class="muscle-pill-icon">❤️</span><div><div class="muscle-pill-name">Cardio</div><div class="muscle-pill-count">Cœur · Poumons</div></div></div>
-    <div class="muscle-pill"><span class="muscle-pill-icon">⚡</span><div><div class="muscle-pill-name">Full Body</div><div class="muscle-pill-count">Full Body · Haut · Bas</div></div></div>
+    {% set icons = {'Dos':'🔵','Poitrine':'🟡','Épaules':'🟣','Bras':'🟢','Core':'⚪','Jambes':'🟠','Cardio':'❤️','Full Body':'⚡'} %}
+    {% for cat, data in categories.items() %}
+    <div class="muscle-pill">
+      <span class="muscle-pill-icon">{{ icons.get(cat, '💪') }}</span>
+      <div>
+        <div class="muscle-pill-name">{{ cat }}</div>
+        <div class="muscle-pill-count">{{ data.noms | join(' · ') }}</div>
+      </div>
+    </div>
+    {% endfor %}
   </div>
 </div>
 
 <hr class="div"/>
 
-<!-- EXERCICES — tirés de exercice.sql (100 tuples réels) -->
+<!-- EXERCICES — dynamiques depuis la BD -->
 <div class="section" id="exercices">
   <div class="section-title">Exercices</div>
   <div class="section-sub">100 exercices — tirés de la table exercice</div>
   <div class="ex-list">
+    {% for ex in exercices %}
     <div class="ex-row">
-      <div><div class="ex-nom">Développé couché (Barre)</div><div class="ex-desc">Poussez la barre au-dessus de la poitrine.</div></div>
-      <span class="badge badge-d">Débutant</span>
-      <span class="badge badge-grey">Barre</span>
-      <span class="badge badge-grey">Poitrine · Épaules</span>
+      <div>
+        <div class="ex-nom">{{ ex.nom }}</div>
+        <div class="ex-desc">{{ ex.description or '' }}</div>
+      </div>
+      {% if ex.difficulte == 'Débutant' %}
+        <span class="badge badge-d">Débutant</span>
+      {% elif ex.difficulte == 'Intermédiaire' %}
+        <span class="badge badge-i">Intermédiaire</span>
+      {% elif ex.difficulte == 'Avancé' %}
+        <span class="badge badge-a">Avancé</span>
+      {% elif ex.difficulte == 'Expert' %}
+        <span class="badge badge-e">Expert</span>
+      {% else %}
+        <span class="badge badge-grey">{{ ex.difficulte }}</span>
+      {% endif %}
+      <span class="badge badge-grey">{{ ex.equipement or 'Aucun' }}</span>
+      <span class="badge badge-grey">{{ ex.muscles or '' }}</span>
     </div>
-    <div class="ex-row">
-      <div><div class="ex-nom">Curl Biceps 21</div><div class="ex-desc">7 reps partielles bas, 7 haut, puis 7 complètes.</div></div>
-      <span class="badge badge-a">Avancé</span>
-      <span class="badge badge-grey">Barre</span>
-      <span class="badge badge-grey">Bras</span>
-    </div>
-    <div class="ex-row">
-      <div><div class="ex-nom">Soulevé de terre</div><div class="ex-desc">Levage de barre du sol aux hanches.</div></div>
-      <span class="badge badge-a">Avancé</span>
-      <span class="badge badge-grey">Barre</span>
-      <span class="badge badge-grey">Dos · Jambes</span>
-    </div>
-    <div class="ex-row">
-      <div><div class="ex-nom">Arnold Press</div><div class="ex-desc">Développé épaules avec rotation des paumes.</div></div>
-      <span class="badge badge-i">Intermédiaire</span>
-      <span class="badge badge-grey">Haltère</span>
-      <span class="badge badge-grey">Épaules</span>
-    </div>
-    <div class="ex-row">
-      <div><div class="ex-nom">Traction classique</div><div class="ex-desc">Traction prise large en pronation.</div></div>
-      <span class="badge badge-a">Avancé</span>
-      <span class="badge badge-grey">Aucun</span>
-      <span class="badge badge-grey">Dos · Épaules</span>
-    </div>
-    <div class="ex-row">
-      <div><div class="ex-nom">Battle Ropes</div><div class="ex-desc">Ondulations de cordes lourdes au sol.</div></div>
-      <span class="badge badge-i">Intermédiaire</span>
-      <span class="badge badge-grey">Autres</span>
-      <span class="badge badge-grey">Cardio · Full Body</span>
-    </div>
-    <div class="ex-row">
-      <div><div class="ex-nom">Muscle Up</div><div class="ex-desc">Traction suivie d'un dip sur barre.</div></div>
-      <span class="badge badge-e">Expert</span>
-      <span class="badge badge-grey">Aucun</span>
-      <span class="badge badge-grey">Full Body</span>
-    </div>
-    <div class="ex-row">
-      <div><div class="ex-nom">Burpee classique</div><div class="ex-desc">Enchaînement squat, pompe et saut.</div></div>
-      <span class="badge badge-a">Avancé</span>
-      <span class="badge badge-grey">Aucun</span>
-      <span class="badge badge-grey">Full Body</span>
-    </div>
+    {% endfor %}
   </div>
 </div>
 
 <hr class="div"/>
 
-<!-- PROGRAMMES — tirés de programme.sql (20 tuples réels) -->
+<!-- PROGRAMMES — dynamiques depuis la BD -->
 <div class="section" id="programmes">
   <div class="section-title">Programmes</div>
-  <div class="section-sub">20 programmes — tirés de la table programme · connectez-vous pour suivre votre progression</div>
+  <div class="section-sub">{{ programmes|length }} programmes — tirés de la table programme · connectez-vous pour suivre votre progression</div>
   <div class="prog-grid">
+    {% for p in programmes %}
     <div class="prog-card">
-      <div class="prog-name">Full Body Débutant</div>
-      <div class="prog-desc">Apprentissage des mouvements polyarticulaires de base.</div>
-      <div class="prog-footer"><span class="prog-dur">8 semaines</span><span class="badge badge-d">Débutant</span></div>
+      <div class="prog-name">{{ p.nom_programme }}</div>
+      <div class="prog-desc">{{ p.description_p or '' }}</div>
+      <div class="prog-footer">
+        <span class="prog-dur">{{ p.duree_semaines }} semaines</span>
+        {% if p.duree_semaines <= 4 %}
+          <span class="badge badge-a">Court</span>
+        {% elif p.duree_semaines <= 8 %}
+          <span class="badge badge-d">Moyen</span>
+        {% else %}
+          <span class="badge badge-i">Long</span>
+        {% endif %}
+      </div>
     </div>
-    <div class="prog-card">
-      <div class="prog-name">Split 4 Jours Hypertrophie</div>
-      <div class="prog-desc">Isolation musculaire poussée pour gain de masse.</div>
-      <div class="prog-footer"><span class="prog-dur">12 semaines</span><span class="badge badge-i">Intermédiaire</span></div>
-    </div>
-    <div class="prog-card">
-      <div class="prog-name">Push Pull Legs (PPL)</div>
-      <div class="prog-desc">Organisation par chaîne musculaire pour athlètes intermédiaires.</div>
-      <div class="prog-footer"><span class="prog-dur">10 semaines</span><span class="badge badge-i">Intermédiaire</span></div>
-    </div>
-    <div class="prog-card">
-      <div class="prog-name">Force Athlétique (SBD)</div>
-      <div class="prog-desc">Focus sur le Squat, Bench et Deadlift — force pure.</div>
-      <div class="prog-footer"><span class="prog-dur">12 semaines</span><span class="badge badge-a">Avancé</span></div>
-    </div>
-    <div class="prog-card">
-      <div class="prog-name">Bodyweight Mastery</div>
-      <div class="prog-desc">Entraînement complet sans matériel, focus calisthénie.</div>
-      <div class="prog-footer"><span class="prog-dur">6 semaines</span><span class="badge badge-i">Intermédiaire</span></div>
-    </div>
-    <div class="prog-card">
-      <div class="prog-name">Circuit Training HIIT</div>
-      <div class="prog-desc">Enchaînements rapides pour endurance métabolique.</div>
-      <div class="prog-footer"><span class="prog-dur">4 semaines</span><span class="badge badge-a">Avancé</span></div>
-    </div>
+    {% endfor %}
   </div>
 </div>
 
 <hr class="div"/>
 
-<!-- INSCRIPTION -->
+<!-- INSCRIPTION — visible uniquement si déconnecté -->
+{% if not session.get('user_id') %}
 <div class="form-section" id="inscription">
   <div class="form-box">
     <h2>Créer un compte</h2>
     <p>Connectez-vous pour sauvegarder votre IMC, suivre vos séances et battre vos records personnels.</p>
 
-    <div class="form-group">
-      <label>Pseudo</label>
-      <input type="text" placeholder="ex: john_doe" maxlength="50"/>
-    </div>
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" placeholder="ex: john@email.com"/>
-    </div>
-    <div class="form-group">
-      <label>Mot de passe</label>
-      <input type="password" placeholder="••••••••"/>
-    </div>
-    <div class="form-group">
-      <label>Date de naissance</label>
-      <input type="date"/>
-    </div>
-    <div class="form-row">
+    <form method="POST" action="/inscription">
       <div class="form-group">
-        <label>Taille (cm)</label>
-        <input type="number" placeholder="175" min="50" max="250"/>
+        <label>Pseudo</label>
+        <input type="text" name="pseudo" placeholder="ex: john_doe" maxlength="50" required/>
       </div>
       <div class="form-group">
-        <label>Poids (kg)</label>
-        <input type="number" placeholder="72.5" min="20" max="300" step="0.1"/>
+        <label>Email</label>
+        <input type="email" name="email" placeholder="ex: john@email.com" required/>
       </div>
-    </div>
-    <div class="form-group">
-      <label>Sexe</label>
-      <select>
-        <option value="">-- Choisir --</option>
-        <option value="homme">Homme</option>
-        <option value="femme">Femme</option>
-        <option value="autre">Autre / Non-binaire</option>
-      </select>
-    </div>
-    <button class="btn btn-accent btn-submit">Créer mon compte</button>
+      <div class="form-group">
+        <label>Mot de passe</label>
+        <input type="password" name="mdp" placeholder="••••••••" minlength="8" required/>
+      </div>
+      <div class="form-group">
+        <label>Date de naissance</label>
+        <input type="date" name="date_naissance" required/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Taille (cm)</label>
+          <input type="number" name="taille" placeholder="175" min="50" max="250" required/>
+        </div>
+        <div class="form-group">
+          <label>Poids (kg)</label>
+          <input type="number" name="poids" placeholder="72.5" min="20" max="300" step="0.1" required/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Sexe</label>
+        <select name="sexe" required>
+          <option value="">-- Choisir --</option>
+          <option value="homme">Homme</option>
+          <option value="femme">Femme</option>
+          <option value="autre">Autre / Non-binaire</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-accent btn-submit">Créer mon compte</button>
+    </form>
     <p style="text-align:center;font-size:.75rem;color:var(--muted);margin-top:.8rem">
-      Déjà un compte ? <a href="#" style="color:var(--text);font-weight:600">Se connecter</a>
+      Déjà un compte ? <a href="#" style="color:var(--text);font-weight:600" onclick="event.preventDefault();document.getElementById('login-overlay').classList.add('open')">Se connecter</a>
     </p>
+  </div>
+</div>
+{% endif %}
+
+<!-- MODAL CONNEXION -->
+<div class="login-overlay" id="login-overlay">
+  <div class="form-box" style="max-width:400px;position:relative">
+    <button onclick="document.getElementById('login-overlay').classList.remove('open')" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer">✕</button>
+    <h2>Connexion</h2>
+    <p>Entrez vos identifiants pour accéder à votre compte.</p>
+    <form method="POST" action="/connexion">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" placeholder="ex: john@email.com" required/>
+      </div>
+      <div class="form-group">
+        <label>Mot de passe</label>
+        <input type="password" name="mdp" placeholder="••••••••" required/>
+      </div>
+      <button type="submit" class="btn btn-accent btn-submit">Se connecter</button>
+    </form>
   </div>
 </div>
 
@@ -498,6 +558,20 @@
     document.getElementById('imc-cat').textContent = cat;
     document.getElementById('imc-result').classList.add('show');
   }
+
+  // Fermer modal connexion en cliquant sur le fond
+  document.getElementById('login-overlay').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
+  });
+
+  // Auto-disparition des flash messages
+  document.querySelectorAll('.flash').forEach(el => {
+    setTimeout(() => {
+      el.style.transition = 'opacity .4s ease';
+      el.style.opacity = '0';
+      setTimeout(() => el.remove(), 400);
+    }, 4000);
+  });
 </script>
 
 </body>

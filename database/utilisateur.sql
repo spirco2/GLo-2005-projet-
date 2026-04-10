@@ -3,6 +3,14 @@
 -- Description : Stocke les profils utilisateurs
 -- =============================================
 
+
+USE db_local;
+
+-- =============================================
+-- Table : Utilisateurs
+-- Description : Stocke les profils utilisateurs
+-- =============================================
+
 DROP TABLE IF EXISTS Utilisateurs;
 
 CREATE TABLE Utilisateurs (
@@ -17,6 +25,7 @@ CREATE TABLE Utilisateurs (
     imc       DECIMAL(4,2)
 ) AUTO_INCREMENT = 101;
 
+-- insertion des données... (le reste de ton script est correct)
 -- =============================================
 -- Insertion des 20 utilisateurs
 -- =============================================

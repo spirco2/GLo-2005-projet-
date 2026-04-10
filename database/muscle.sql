@@ -4,6 +4,7 @@
 --               et leur catégorie
 -- =============================================
 CREATE DATABASE db_local;
+USE db_local;
 DROP TABLE IF EXISTS Muscles;
 
 CREATE TABLE Muscles (

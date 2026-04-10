@@ -1,7 +1,6 @@
-
+USE db_local;
 DROP TABLE IF EXISTS cibler;
 DROP TABLE IF EXISTS exercice;
-
 
 CREATE TABLE exercice (
     id_ex INT PRIMARY KEY AUTO_INCREMENT,

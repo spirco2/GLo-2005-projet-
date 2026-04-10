@@ -314,15 +314,16 @@
     <li><a href="/stats">Statistiques</a></li>
   </ul>
   <div class="nav-right">
-    <!-- Flask: initiale du user → {{ user.username[0]|upper }} -->
-    <div class="nav-avatar" id="nav-avatar"></div>
+    <div class="nav-avatar" id="nav-avatar">{{ user.pseudo[:2]|upper if user else '' }}</div>
     <button class="hamburger" id="hamburger" aria-label="Menu">☰</button>
   </div>
 </nav>
 
-<!-- FLASH MESSAGES — Flask: {% with messages = get_flashed_messages(with_categories=true) %} -->
-<!-- <div class="flash success">Modifications enregistrées avec succès.</div> -->
-<!-- <div class="flash error">Erreur lors de la mise à jour.</div> -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    <div class="flash {{ category }}">{{ message }}</div>
+  {% endfor %}
+{% endwith %}
 
 <div class="page-header">
   <h1>Mon compte</h1>
@@ -335,37 +336,6 @@
 </div>
 
 <div class="settings-section">
-
-  <!--
-    ══════════════════════════════════════════════
-    FLASK INTEGRATION GUIDE
-    ══════════════════════════════════════════════
-    Ce formulaire est prévu pour un POST vers Flask.
-
-    Route suggérée :
-      @app.route('/securite', methods=['GET', 'POST'])
-      def securite():
-          user = get_current_user()  # depuis la session
-          if request.method == 'POST':
-              action = request.form.get('action')
-              if action == 'update_profile':
-                  # request.form: username, fullname, sex, birthdate, private_profile
-                  ...
-              elif action == 'update_password':
-                  # request.form: current_password, new_password, confirm_password
-                  ...
-              elif action == 'delete_account':
-                  ...
-          return render_template('securite.html', user=user)
-
-    Template Jinja2 :
-      value="{{ user.username }}"
-      value="{{ user.nom }}"
-      value="{{ user.date_naissance }}"
-      {{ 'selected' if user.sexe == 'homme' }}
-      {{ 'checked' if user.profil_prive }}
-    ══════════════════════════════════════════════
-  -->
 
   <!-- ─── Profil Card ─── -->
   <form method="POST" action="/securite">
@@ -383,12 +353,10 @@
       <div class="form-row">
         <div class="form-group">
           <label for="username">Nom d'utilisateur</label>
-          <!-- Flask: value="{{ user.username }}" -->
-          <input type="text" id="username" name="username" placeholder="ex: john_doe" value="" maxlength="50" required/>
+          <input type="text" id="username" name="username" placeholder="ex: john_doe" value="{{ user.pseudo if user else '' }}" maxlength="50" required/>
         </div>
         <div class="form-group">
           <label for="fullname">Nom complet</label>
-          <!-- Flask: value="{{ user.nom }}" -->
           <input type="text" id="fullname" name="fullname" placeholder="ex: John Doe" value="" maxlength="100"/>
         </div>
       </div>
@@ -396,18 +364,16 @@
       <div class="form-row">
         <div class="form-group">
           <label for="sex">Sexe</label>
-          <!-- Flask: {{ 'selected' if user.sexe == 'homme' }} -->
           <select id="sex" name="sex">
             <option value="">-- Choisir --</option>
-            <option value="homme">Homme</option>
-            <option value="femme">Femme</option>
-            <option value="autre">Autre / Non-binaire</option>
+            <option value="homme" {{ 'selected' if user and user.sexe == 'homme' }}>Homme</option>
+            <option value="femme" {{ 'selected' if user and user.sexe == 'femme' }}>Femme</option>
+            <option value="autre" {{ 'selected' if user and user.sexe == 'autre' }}>Autre / Non-binaire</option>
           </select>
         </div>
         <div class="form-group">
           <label for="birthdate">Date de naissance</label>
-          <!-- Flask: value="{{ user.date_naissance }}" -->
-          <input type="date" id="birthdate" name="birthdate" value=""/>
+          <input type="date" id="birthdate" name="birthdate" value="{{ user.date if user else '' }}"/>
         </div>
       </div>
 
@@ -419,7 +385,6 @@
           <div class="toggle-row-sub">Les autres utilisateurs devront demander à vous suivre. Seuls vos abonnés verront vos entraînements.</div>
         </div>
         <label class="toggle-switch">
-          <!-- Flask: {{ 'checked' if user.profil_prive }} -->
           <input type="checkbox" id="private_profile" name="private_profile" value="1"/>
           <span class="toggle-track"></span>
         </label>

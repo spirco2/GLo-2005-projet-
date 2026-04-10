@@ -1,3 +1,4 @@
+USE db_local;
 DROP TABLE IF EXISTS serie_log;
 DROP TABLE IF EXISTS record_personnel;
 

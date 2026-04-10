@@ -509,59 +509,10 @@
     <li><a href="/stats" class="active">Statistiques</a></li>
   </ul>
   <div class="nav-right">
-    <!-- Flask: {{ user.username[0]|upper }} -->
-    <div class="nav-avatar" id="nav-avatar"></div>
+    <div class="nav-avatar" id="nav-avatar">{{ user.pseudo[:2]|upper if user else '' }}</div>
     <button class="hamburger" id="hamburger" aria-label="Menu">☰</button>
   </div>
 </nav>
-
-<!--
-  ══════════════════════════════════════════════
-  FLASK INTEGRATION GUIDE
-  ══════════════════════════════════════════════
-  Route suggérée :
-    @app.route('/stats')
-    def stats():
-        user = get_current_user()
-        stats = get_user_stats(user.id)
-        # stats = {
-        #   'volume_total': 24830,
-        #   'nb_seances': 151,
-        #   'temps_total_min': 5420,
-        #   'streak_semaines': 5,  # nb de semaines consécutives avec au moins 1 séance
-        #   'weekly_data': [
-        #     {'label': 'Jan 5', 'minutes': 45, 'pct': 12},
-        #     {'label': 'Jan 12', 'minutes': 110, 'pct': 28},
-        #     ...
-        #   ],
-        #   'recent_workouts': [
-        #     {'name': 'Push', 'date': '16 mars', 'nb_exercises': 6, 'duration': '52 min'},
-        #     ...
-        #   ],
-        #   'calendar_days': [
-        #     {'day': 1, 'current_month': True, 'today': False, 'has_workout': False},
-        #     ...
-        #   ]
-        # }
-        return render_template('stats.html', user=user, stats=stats)
-
-  Template Jinja2 :
-    {{ stats.volume_total | format_number }}
-    {{ stats.nb_seances }}
-    {% for week in stats.weekly_data %}
-      <div class="bar-col">
-        <div class="bar accent" style="height:{{ week.pct }}%" data-tip="{{ week.minutes }} min"></div>
-        <span class="bar-week">{{ week.label }}</span>
-      </div>
-    {% endfor %}
-    {% for w in stats.recent_workouts %}
-      <div class="workout-row">...</div>
-    {% endfor %}
-    {% for d in stats.calendar_days %}
-      <span class="cal-day {{ 'current-month' if d.current_month }} {{ 'today' if d.today }} {{ 'has-workout' if d.has_workout }}">{{ d.day }}</span>
-    {% endfor %}
-  ══════════════════════════════════════════════
--->
 
 <div class="page-header">
   <h1>Statistiques</h1>
@@ -571,23 +522,18 @@
 <!-- PROFILE BANNER -->
 <div class="profile-banner">
   <div class="profile-banner-inner">
-    <!-- Flask: {{ user.username[0]|upper }} -->
-    <div class="profile-avatar" id="profile-avatar"></div>
+    <div class="profile-avatar" id="profile-avatar">{{ user.pseudo[:2]|upper if user else '' }}</div>
     <div class="profile-info">
-      <!-- Flask: {{ user.nom }} -->
-      <div class="profile-name" id="profile-name">—</div>
-      <!-- Flask: @{{ user.username }} -->
-      <div class="profile-handle" id="profile-handle">@—</div>
+      <div class="profile-name" id="profile-name">{{ user.pseudo if user else '—' }}</div>
+      <div class="profile-handle" id="profile-handle">@{{ user.pseudo if user else '—' }}</div>
     </div>
     <div class="profile-stats">
       <div class="profile-stat">
-        <!-- Flask: {{ stats.nb_seances }} -->
-        <div class="profile-stat-val" id="stat-workouts">—</div>
+        <div class="profile-stat-val" id="stat-workouts">{{ stats.nb_seances }}</div>
         <div class="profile-stat-label">Séances</div>
       </div>
       <div class="profile-stat">
-        <!-- Flask: {{ stats.streak_semaines }} -->
-        <div class="profile-stat-val" id="stat-streak">—</div>
+        <div class="profile-stat-val" id="stat-streak">{{ stats.streak_semaines }}</div>
         <div class="profile-stat-label">Semaines d'affilée</div>
       </div>
     </div>
@@ -602,24 +548,21 @@
     <div class="score-card">
       <div class="score-card-icon">🏋️</div>
       <div>
-        <!-- Flask: {{ stats.volume_total | format_number }} -->
-        <div class="score-card-value" id="card-volume">—</div>
+        <div class="score-card-value" id="card-volume">{{ '{:,.0f}'.format(stats.volume_total) }}</div>
         <div class="score-card-label">Volume total (kg)</div>
       </div>
     </div>
     <div class="score-card">
       <div class="score-card-icon">📅</div>
       <div>
-        <!-- Flask: {{ stats.nb_seances }} -->
-        <div class="score-card-value" id="card-seances">—</div>
+        <div class="score-card-value" id="card-seances">{{ stats.nb_seances }}</div>
         <div class="score-card-label">Nombre de séances</div>
       </div>
     </div>
     <div class="score-card">
       <div class="score-card-icon">⏱️</div>
       <div>
-        <!-- Flask: {{ stats.temps_total_min }} -->
-        <div class="score-card-value" id="card-temps">—</div>
+        <div class="score-card-value" id="card-temps">{{ stats.temps_total_min }}</div>
         <div class="score-card-label">Temps total (min)</div>
       </div>
     </div>
@@ -638,26 +581,22 @@
       </div>
     </div>
 
-    <!--
-      Flask/Jinja2 :
-      <div class="chart-area" style="margin-left:2rem" id="chart-bars">
-        <div class="y-axis"><span>7h</span><span>5h</span><span>3h</span><span>1h</span><span></span></div>
+    <div class="chart-area" style="margin-left:2rem" id="chart-bars">
+      <div class="y-axis"><span>7h</span><span>5h</span><span>3h</span><span>1h</span><span></span></div>
+      {% if stats.weekly_data %}
         {% for week in stats.weekly_data %}
           <div class="bar-col">
             <div class="bar accent" style="height:{{ week.pct }}%" data-tip="{{ week.minutes }} min"></div>
             <span class="bar-week">{{ week.label }}</span>
           </div>
         {% endfor %}
-      </div>
-    -->
-    <div class="chart-area" style="margin-left:2rem" id="chart-bars">
-      <div class="y-axis"><span>7h</span><span>5h</span><span>3h</span><span>1h</span><span></span></div>
-      <!-- Bars will be injected by Flask via {% for %} or by JS fetch -->
-      <div class="empty-state" style="width:100%;align-self:center">
-        <div class="empty-state-icon">📊</div>
-        <div class="empty-state-title">Aucune donnée</div>
-        <div class="empty-state-text">Commencez à enregistrer vos séances pour voir votre progression ici.</div>
-      </div>
+      {% else %}
+        <div class="empty-state" style="width:100%;align-self:center">
+          <div class="empty-state-icon">📊</div>
+          <div class="empty-state-title">Aucune donnée</div>
+          <div class="empty-state-text">Commencez à enregistrer vos séances pour voir votre progression ici.</div>
+        </div>
+      {% endif %}
     </div>
 
     <div class="chart-legend">
@@ -674,7 +613,6 @@
       <div class="calendar-header">
         <h3>Calendrier</h3>
         <div style="display:flex;align-items:center;gap:.5rem">
-          <!-- Flask: {{ stats.calendar_month_label }} -->
           <span style="font-size:.82rem;font-weight:600" id="calendar-month">—</span>
           <div class="calendar-nav">
             <button id="cal-prev">‹</button>
@@ -682,7 +620,7 @@
           </div>
         </div>
       </div>
-      <div class="calendar-grid" id="calendar-grid">
+      <div class="calendar-grid" id="calendar-grid" data-jours="{{ stats.jours_seance | tojson }}">
         <span class="cal-day-name">D</span>
         <span class="cal-day-name">L</span>
         <span class="cal-day-name">M</span>
@@ -690,20 +628,13 @@
         <span class="cal-day-name">J</span>
         <span class="cal-day-name">V</span>
         <span class="cal-day-name">S</span>
-        <!--
-          Flask/Jinja2 :
-          {% for d in stats.calendar_days %}
-            <span class="cal-day {{ 'current-month' if d.current_month }} {{ 'today' if d.today }} {{ 'has-workout' if d.has_workout }}">{{ d.day }}</span>
-          {% endfor %}
-        -->
       </div>
     </div>
 
     <div class="recent-card">
       <h3>Séances récentes</h3>
       <div id="recent-workouts">
-        <!--
-          Flask/Jinja2 :
+        {% if stats.recent_workouts %}
           {% for w in stats.recent_workouts %}
           <div class="workout-row">
             <div>
@@ -712,16 +643,14 @@
             </div>
             <div class="workout-dur">{{ w.duration }}</div>
           </div>
-          {% else %}
-        -->
+          {% endfor %}
+        {% else %}
         <div class="empty-state">
           <div class="empty-state-icon">🏃</div>
           <div class="empty-state-title">Aucune séance</div>
           <div class="empty-state-text">Vos séances récentes apparaîtront ici.</div>
         </div>
-        <!--
-          {% endfor %}
-        -->
+        {% endif %}
       </div>
     </div>
   </div>
@@ -745,6 +674,48 @@
       tab.classList.add('active');
     });
   });
+
+  // Calendrier — généré côté client avec les jours de séance injectés par Flask
+  (function() {
+    const calEl = document.getElementById('calendar-grid');
+    if (!calEl) return;
+
+    let joursAvecSeance = [];
+    try {
+      joursAvecSeance = JSON.parse(calEl.dataset.jours || '[]');
+    } catch { return; }
+
+    const today    = new Date();
+    const annee    = today.getFullYear();
+    const mois     = today.getMonth();
+    const premierJ = new Date(annee, mois, 1).getDay();
+    const nbJours  = new Date(annee, mois + 1, 0).getDate();
+
+    const moisLabel = document.getElementById('calendar-month');
+    if (moisLabel) {
+      moisLabel.textContent = today.toLocaleDateString('fr-CA', {
+        month: 'long',
+        year: 'numeric',
+      });
+    }
+
+    let html = '';
+    for (let i = 0; i < premierJ; i++) {
+      html += '<span class="cal-day"></span>';
+    }
+    for (let j = 1; j <= nbJours; j++) {
+      const isToday   = j === today.getDate();
+      const hasSeance = joursAvecSeance.includes(j);
+      const classes   = [
+        'cal-day',
+        'current-month',
+        isToday   ? 'today'       : '',
+        hasSeance ? 'has-workout' : '',
+      ].filter(Boolean).join(' ');
+      html += `<span class="${classes}">${j}</span>`;
+    }
+    calEl.innerHTML = calEl.innerHTML + html;
+  })();
 </script>
 
 </body>

@@ -543,7 +543,7 @@
         #     ...
         #   ]
         # }
-        return render_template('stats.html', user=user, stats=stats)
+        return render_template('stats.templates', user=user, stats=stats)
 
   Template Jinja2 :
     {{ stats.volume_total | format_number }}

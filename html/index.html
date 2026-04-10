@@ -48,6 +48,7 @@
       font-size: 1.3rem;
       font-weight: 800;
       color: var(--accent);
+      text-decoration: none;
     }
 
     .nav-links { display: flex; gap: 1.8rem; list-style: none; }
@@ -64,17 +65,33 @@
     .btn-lg { padding: .75rem 1.8rem; font-size: .95rem; }
 
     .nav-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #111;
-      display: grid;
-      place-items: center;
-      font-weight: 700;
-      font-size: .8rem;
-      flex-shrink: 0;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--accent); color: #111;
+      display: grid; place-items: center;
+      font-weight: 700; font-size: .8rem;
+      flex-shrink: 0; cursor: pointer;
     }
+
+    /* DROPDOWN */
+    .profile-dropdown { position: relative; }
+    .dropdown-menu {
+      display: none; position: absolute; top: 44px; right: 0;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); min-width: 200px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.5); z-index: 200;
+      overflow: hidden;
+    }
+    .profile-dropdown.open .dropdown-menu { display: block; }
+    .dropdown-header { padding: .9rem 1rem .5rem; font-weight: 700; font-size: .82rem; color: var(--accent); border-bottom: 1px solid var(--border); }
+    .dropdown-item { display: block; padding: .6rem 1rem; font-size: .82rem; color: var(--text); text-decoration: none; transition: background .15s; }
+    .dropdown-item:hover { background: var(--surface2); }
+    .dropdown-danger { color: var(--red); }
+    .dropdown-danger:hover { background: rgba(248,113,113,.08); }
+    .dropdown-divider { border-top: 1px solid var(--border); margin: .3rem 0; }
+
+    /* LOGIN OVERLAY */
+    .login-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:200; align-items:center; justify-content:center }
+    .login-overlay.open { display:flex }
 
     /* HERO */
     .hero {
@@ -154,78 +171,7 @@
     .imc-number { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--accent); }
     .imc-cat { font-size: .85rem; color: var(--muted); }
 
-    /* DIVIDER */
     hr.div { border: none; border-top: 1px solid var(--border); margin: 0 2rem; }
-
-    /* SECTION */
-    .section { max-width: 1100px; margin: 0 auto; padding: 3rem 2rem; }
-    .section-title { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; margin-bottom: .3rem; }
-    .section-sub { font-size: .82rem; color: var(--muted); margin-bottom: 1.6rem; }
-
-    /* MUSCLES */
-    .muscles-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: .7rem; }
-
-    .muscle-pill {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1rem 1.1rem;
-      display: flex;
-      align-items: center;
-      gap: .8rem;
-      cursor: pointer;
-      transition: border-color .2s;
-    }
-
-    .muscle-pill:hover { border-color: var(--accent); }
-    .muscle-pill-icon { font-size: 1.2rem; }
-    .muscle-pill-name { font-weight: 600; font-size: .85rem; }
-    .muscle-pill-count { font-size: .7rem; color: var(--muted); margin-top: .1rem; }
-
-    /* EXERCICES */
-    .ex-list { display: flex; flex-direction: column; gap: .5rem; }
-
-    .ex-row {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1rem 1.3rem;
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr;
-      align-items: center;
-      gap: 1rem;
-      transition: border-color .2s;
-    }
-
-    .ex-row:hover { border-color: var(--border); }
-    .ex-nom { font-weight: 600; font-size: .88rem; }
-    .ex-desc { font-size: .72rem; color: var(--muted); margin-top: .15rem; }
-
-    /* PROGRAMMES */
-    .prog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; }
-
-    .prog-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.3rem;
-      cursor: pointer;
-      transition: border-color .2s;
-    }
-
-    .prog-card:hover { border-color: var(--accent); }
-    .prog-name { font-weight: 700; font-size: .9rem; margin-bottom: .4rem; }
-    .prog-desc { font-size: .75rem; color: var(--muted); line-height: 1.5; margin-bottom: .9rem; }
-    .prog-footer { display: flex; justify-content: space-between; align-items: center; }
-    .prog-dur { font-size: .72rem; color: var(--muted); }
-
-    /* BADGES */
-    .badge { font-size: .68rem; font-weight: 600; padding: .2rem .6rem; border-radius: 99px; }
-    .badge-grey { background: var(--surface2); color: var(--muted); }
-    .badge-d { background: rgba(74,222,128,.1); color: var(--green); }
-    .badge-i { background: rgba(251,146,60,.1); color: var(--orange); }
-    .badge-a { background: rgba(248,113,113,.1); color: var(--red); }
-    .badge-e { background: rgba(192,132,252,.1); color: var(--purple); }
 
     /* FORM */
     .form-section { max-width: 500px; margin: 0 auto; padding: 3rem 2rem; }
@@ -240,7 +186,6 @@
     .form-box h2 { font-family: 'Syne', sans-serif; font-size: 1.3rem; margin-bottom: .3rem; }
     .form-box > p { font-size: .8rem; color: var(--muted); margin-bottom: 1.5rem; }
     .form-group { margin-bottom: .9rem; }
-
     .form-group label { display: block; font-size: .72rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: .35rem; }
 
     .form-group input, .form-group select {
@@ -263,43 +208,38 @@
 
     /* FLASH */
     .flash-container {
-      position: fixed;
-      top: 4.5rem;
-      right: 1.5rem;
-      z-index: 999;
-      display: flex;
-      flex-direction: column;
-      gap: .5rem;
-      max-width: 360px;
+      position: fixed; top: 4.5rem; right: 1.5rem; z-index: 999;
+      display: flex; flex-direction: column; gap: .5rem; max-width: 360px;
     }
-
     .flash {
-      padding: .75rem 1.1rem;
-      border-radius: 8px;
-      font-size: .85rem;
-      font-weight: 500;
-      border: 1px solid transparent;
-      animation: slideIn .25s ease;
+      padding: .75rem 1.1rem; border-radius: 8px; font-size: .85rem; font-weight: 500;
+      border: 1px solid transparent; animation: slideIn .25s ease;
     }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(20px); }
-      to   { opacity: 1; transform: translateX(0); }
-    }
-
+    @keyframes slideIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
     .flash-success { background: rgba(74,222,128,.12); border-color: rgba(74,222,128,.3); color: var(--green); }
     .flash-error   { background: rgba(248,113,113,.12); border-color: rgba(248,113,113,.3); color: var(--red); }
 
-    /* CONNEXION MODAL */
-    .login-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center}
-    .login-overlay.open{display:flex}
+    .hamburger { display: none; background: none; border: none; color: var(--text); font-size: 1.4rem; cursor: pointer; }
 
     footer { text-align: center; padding: 2rem; font-size: .75rem; color: var(--muted); border-top: 1px solid var(--border); margin-top: 2rem; }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        position: fixed; top: 60px; left: 0; right: 0;
+        background: var(--surface); border-bottom: 1px solid var(--border);
+        flex-direction: column; padding: 1rem 2rem; gap: .6rem;
+        transform: translateY(-120%); transition: transform .3s ease;
+      }
+      .nav-links.open { transform: translateY(0); }
+      .hamburger { display: block; }
+      .hero h1 { font-size: 2.4rem; }
+      .imc-form { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
 
-<!-- FLASH MESSAGES -->
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
   <div class="flash-container">
@@ -310,30 +250,8 @@
   {% endif %}
 {% endwith %}
 
-<!-- NAV -->
-<nav>
-  <div class="logo">IronTrack</div>
-  <ul class="nav-links">
-    <li><a href="#imc" class="active">Calculer IMC</a></li>
-    <li><a href="#muscles">Muscles</a></li>
-    <li><a href="#exercices">Exercices</a></li>
-    <li><a href="#programmes">Programmes</a></li>
-    {% if session.get('user_id') %}
-      <li><a href="/programmes">Mes Programmes</a></li>
-      <li><a href="/stats">Suivi</a></li>
-    {% endif %}
-  </ul>
-  <div class="nav-right">
-    {% if session.get('user_id') %}
-      <div class="nav-avatar">{{ session.get('pseudo', '??')[:2]|upper }}</div>
-      <a href="/securite" class="btn btn-ghost" style="text-decoration:none">Mon compte</a>
-      <a href="/deconnexion" class="btn btn-ghost" style="text-decoration:none">Déconnexion</a>
-    {% else %}
-      <button class="btn btn-ghost" onclick="document.getElementById('login-overlay').classList.add('open')">Connexion</button>
-      <a href="#inscription" class="btn btn-accent" style="text-decoration:none">S'inscrire</a>
-    {% endif %}
-  </div>
-</nav>
+{% set active_page = 'accueil' %}
+{% include 'navbar.html' %}
 
 <!-- HERO -->
 <div class="hero">
@@ -342,10 +260,10 @@
   <div class="hero-btns">
     {% if session.get('user_id') %}
       <a href="/programmes" class="btn btn-accent btn-lg" style="text-decoration:none">Mes Programmes</a>
-      <a href="/stats" class="btn btn-ghost btn-lg" style="text-decoration:none">Mon Suivi</a>
+      <a href="/statistiques" class="btn btn-ghost btn-lg" style="text-decoration:none">Mon Suivi</a>
     {% else %}
       <a href="#inscription" class="btn btn-accent btn-lg" style="text-decoration:none">Commencer</a>
-      <a href="#exercices" class="btn btn-ghost btn-lg" style="text-decoration:none">Explorer</a>
+      <a href="/explorer" class="btn btn-ghost btn-lg" style="text-decoration:none">Explorer</a>
     {% endif %}
   </div>
   <div class="hero-note">Pas besoin de compte pour calculer votre IMC 👇</div>
@@ -382,92 +300,14 @@
   </div>
 </div>
 
-<hr class="div"/>
-
-<!-- MUSCLES — dynamiques depuis la BD -->
-<div class="section" id="muscles">
-  <div class="section-title">Groupes musculaires</div>
-  <div class="section-sub">20 muscles · 8 catégories — tirés de la table Muscles</div>
-  <div class="muscles-grid">
-    {% set icons = {'Dos':'🔵','Poitrine':'🟡','Épaules':'🟣','Bras':'🟢','Core':'⚪','Jambes':'🟠','Cardio':'❤️','Full Body':'⚡'} %}
-    {% for cat, data in categories.items() %}
-    <div class="muscle-pill">
-      <span class="muscle-pill-icon">{{ icons.get(cat, '💪') }}</span>
-      <div>
-        <div class="muscle-pill-name">{{ cat }}</div>
-        <div class="muscle-pill-count">{{ data.noms | join(' · ') }}</div>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-</div>
-
-<hr class="div"/>
-
-<!-- EXERCICES — dynamiques depuis la BD -->
-<div class="section" id="exercices">
-  <div class="section-title">Exercices</div>
-  <div class="section-sub">100 exercices — tirés de la table exercice</div>
-  <div class="ex-list">
-    {% for ex in exercices %}
-    <div class="ex-row">
-      <div>
-        <div class="ex-nom">{{ ex.nom }}</div>
-        <div class="ex-desc">{{ ex.description or '' }}</div>
-      </div>
-      {% if ex.difficulte == 'Débutant' %}
-        <span class="badge badge-d">Débutant</span>
-      {% elif ex.difficulte == 'Intermédiaire' %}
-        <span class="badge badge-i">Intermédiaire</span>
-      {% elif ex.difficulte == 'Avancé' %}
-        <span class="badge badge-a">Avancé</span>
-      {% elif ex.difficulte == 'Expert' %}
-        <span class="badge badge-e">Expert</span>
-      {% else %}
-        <span class="badge badge-grey">{{ ex.difficulte }}</span>
-      {% endif %}
-      <span class="badge badge-grey">{{ ex.equipement or 'Aucun' }}</span>
-      <span class="badge badge-grey">{{ ex.muscles or '' }}</span>
-    </div>
-    {% endfor %}
-  </div>
-</div>
-
-<hr class="div"/>
-
-<!-- PROGRAMMES — dynamiques depuis la BD -->
-<div class="section" id="programmes">
-  <div class="section-title">Programmes</div>
-  <div class="section-sub">{{ programmes|length }} programmes — tirés de la table programme · connectez-vous pour suivre votre progression</div>
-  <div class="prog-grid">
-    {% for p in programmes %}
-    <div class="prog-card">
-      <div class="prog-name">{{ p.nom_programme }}</div>
-      <div class="prog-desc">{{ p.description_p or '' }}</div>
-      <div class="prog-footer">
-        <span class="prog-dur">{{ p.duree_semaines }} semaines</span>
-        {% if p.duree_semaines <= 4 %}
-          <span class="badge badge-a">Court</span>
-        {% elif p.duree_semaines <= 8 %}
-          <span class="badge badge-d">Moyen</span>
-        {% else %}
-          <span class="badge badge-i">Long</span>
-        {% endif %}
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-</div>
-
-<hr class="div"/>
-
-<!-- INSCRIPTION — visible uniquement si déconnecté -->
 {% if not session.get('user_id') %}
+<hr class="div"/>
+
+<!-- INSCRIPTION -->
 <div class="form-section" id="inscription">
   <div class="form-box">
     <h2>Créer un compte</h2>
     <p>Connectez-vous pour sauvegarder votre IMC, suivre vos séances et battre vos records personnels.</p>
-
     <form method="POST" action="/inscription">
       <div class="form-group">
         <label>Pseudo</label>
@@ -513,26 +353,6 @@
 </div>
 {% endif %}
 
-<!-- MODAL CONNEXION -->
-<div class="login-overlay" id="login-overlay">
-  <div class="form-box" style="max-width:400px;position:relative">
-    <button onclick="document.getElementById('login-overlay').classList.remove('open')" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer">✕</button>
-    <h2>Connexion</h2>
-    <p>Entrez vos identifiants pour accéder à votre compte.</p>
-    <form method="POST" action="/connexion">
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" name="email" placeholder="ex: john@email.com" required/>
-      </div>
-      <div class="form-group">
-        <label>Mot de passe</label>
-        <input type="password" name="mdp" placeholder="••••••••" required/>
-      </div>
-      <button type="submit" class="btn btn-accent btn-submit">Se connecter</button>
-    </form>
-  </div>
-</div>
-
 <footer>
   IronTrack — Projet GLO-2005 · Hachim · Melvin · Abdelali · Fabrice
 </footer>
@@ -541,36 +361,35 @@
   function calculerIMC() {
     const taille = parseFloat(document.getElementById('taille').value);
     const poids  = parseFloat(document.getElementById('poids').value);
-
     if (!taille || !poids || taille < 50 || taille > 250 || poids < 20 || poids > 300) {
       alert('Veuillez entrer une taille (50–250 cm) et un poids (20–300 kg) valides.');
       return;
     }
-
     const imc = poids / ((taille / 100) * (taille / 100));
     let cat = '';
     if      (imc < 18.5) cat = 'Sous-poids';
     else if (imc < 25)   cat = 'Poids normal ✓';
     else if (imc < 30)   cat = 'Surpoids';
     else                 cat = 'Obésité';
-
     document.getElementById('imc-val').textContent = imc.toFixed(2);
     document.getElementById('imc-cat').textContent = cat;
     document.getElementById('imc-result').classList.add('show');
   }
 
-  // Fermer modal connexion en cliquant sur le fond
-  document.getElementById('login-overlay').addEventListener('click', function(e) {
-    if (e.target === this) this.classList.remove('open');
+  // Hamburger
+  const hb = document.getElementById('hamburger');
+  if (hb) hb.addEventListener('click', () => document.getElementById('navLinks').classList.toggle('open'));
+
+  // Dropdown close on outside click
+  document.addEventListener('click', e => {
+    document.querySelectorAll('.profile-dropdown.open').forEach(d => {
+      if (!d.contains(e.target)) d.classList.remove('open');
+    });
   });
 
-  // Auto-disparition des flash messages
+  // Flash auto-dismiss
   document.querySelectorAll('.flash').forEach(el => {
-    setTimeout(() => {
-      el.style.transition = 'opacity .4s ease';
-      el.style.opacity = '0';
-      setTimeout(() => el.remove(), 400);
-    }, 4000);
+    setTimeout(() => { el.style.transition='opacity .4s'; el.style.opacity='0'; setTimeout(()=>el.remove(),400); }, 4000);
   });
 </script>
 

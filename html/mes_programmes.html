@@ -17,6 +17,7 @@
       --muted:   #555;
       --muted2:  #888;
       --danger:  #ff4040;
+      --green:   #4ade80;
       --r:       10px;
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -24,19 +25,31 @@
 
     /* NAV */
     nav{display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:56px;background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
-    .logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--accent);letter-spacing:1px}
+    .logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--accent);letter-spacing:1px;text-decoration:none}
     .nav-links{display:flex;gap:1.75rem;list-style:none}
     .nav-links a{color:var(--muted2);text-decoration:none;font-size:0.875rem;font-weight:500;transition:color .2s}
     .nav-links a:hover{color:var(--text)}
     .nav-links a.active{color:var(--accent)}
-    .nav-right{display:flex;gap:.6rem}
-    .btn{font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;padding:.4rem .9rem;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text);transition:all .2s}
+    .nav-right{display:flex;gap:.6rem;align-items:center}
+    .btn{font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;padding:.4rem .9rem;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text);transition:all .2s;text-decoration:none}
     .btn:hover{border-color:var(--accent);color:var(--accent)}
     .btn.primary{background:var(--accent);color:#000;border-color:var(--accent)}
     .btn.primary:hover{background:var(--accent2)}
     .btn.danger:hover{border-color:var(--danger);color:var(--danger)}
     .btn.ghost{border:1px dashed var(--border);color:var(--muted2)}
     .btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+    /* DROPDOWN PROFIL */
+    .profile-dropdown{position:relative}
+    .nav-avatar{width:32px;height:32px;border-radius:50%;background:var(--accent);color:#000;display:grid;place-items:center;font-weight:800;font-size:.75rem;cursor:pointer;flex-shrink:0}
+    .dropdown-menu{display:none;position:absolute;top:42px;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);min-width:190px;box-shadow:0 12px 40px rgba(0,0,0,.6);z-index:200;overflow:hidden}
+    .profile-dropdown.open .dropdown-menu{display:block}
+    .dropdown-header{padding:.8rem 1rem .4rem;font-weight:700;font-size:.78rem;color:var(--accent);border-bottom:1px solid var(--border)}
+    .dropdown-item{display:block;padding:.55rem 1rem;font-size:.8rem;color:var(--text);text-decoration:none;transition:background .15s}
+    .dropdown-item:hover{background:var(--surface2)}
+    .dropdown-danger{color:var(--danger)}
+    .dropdown-danger:hover{background:rgba(255,64,64,.08)}
+    .dropdown-divider{border-top:1px solid var(--border);margin:.25rem 0}
 
     /* LAYOUT 3 COLONNES */
     .layout{display:grid;grid-template-columns:300px 1fr 360px;height:calc(100vh - 56px)}
@@ -157,20 +170,30 @@
 
 <!-- NAV -->
 <nav>
-  <span class="logo">IronTrack</span>
+  <a href="/" class="logo">IronTrack</a>
   <ul class="nav-links">
-    <li><a href="/">Calculer IMC</a></li>
-    <li><a href="/">Muscles</a></li>
-    <li><a href="/">Exercices</a></li>
+    <li><a href="/">Accueil</a></li>
+    <li><a href="/explorer">Explorer</a></li>
     <li><a href="/programmes" class="active">Mes Programmes</a></li>
-    <li><a href="/stats">Suivi</a></li>
+    <li><a href="/statistiques">Statistiques</a></li>
   </ul>
   <div class="nav-right">
     {% if session.get('user_id') %}
-      <a href="/deconnexion" class="btn">Déconnexion</a>
+      <div class="profile-dropdown">
+        <div class="nav-avatar" onclick="this.parentElement.classList.toggle('open')">
+          {{ session.get('pseudo', '??')[:2]|upper }}
+        </div>
+        <div class="dropdown-menu">
+          <div class="dropdown-header">{{ session.get('pseudo', '') }}</div>
+          <a href="/securite" class="dropdown-item">👤 Mon Profil</a>
+          <a href="/securite#password" class="dropdown-item">🔒 Sécurité</a>
+          <div class="dropdown-divider"></div>
+          <a href="/deconnexion" class="dropdown-item dropdown-danger">↪ Déconnexion</a>
+        </div>
+      </div>
     {% else %}
-      <button class="btn" onclick="window.location.href='/'">Connexion</button>
-      <button class="btn primary" onclick="window.location.href='/#inscription'">S'inscrire</button>
+      <a href="/" class="btn">Connexion</a>
+      <a href="/#inscription" class="btn primary">S'inscrire</a>
     {% endif %}
   </div>
 </nav>
@@ -258,7 +281,6 @@
 // DONNÉES — injectées par Flask via Jinja2
 // ═══════════════════════════════════════════════════════════════
 const EXERCICES = {{ exercices | tojson | safe }};
-
 const MUSCLES = [...new Set(EXERCICES.flatMap(e=>e.muscles))].sort();
 
 // ═══════════════════════════════════════════════════════════════
@@ -266,21 +288,28 @@ const MUSCLES = [...new Set(EXERCICES.flatMap(e=>e.muscles))].sort();
 // ═══════════════════════════════════════════════════════════════
 let programmes = {{ programmes | tojson | safe }};
 
-let progActif      = null;   // programme sélectionné
-let modeEdition    = null;   // id du prog en mode "ajouter exercices"
+let progActif      = null;
+let modeEdition    = null;
 let seanceActive   = false;
-let seanceExos     = [];     // [{exo, series:[...]}]
+let seanceExos     = [];
 let filterMuscle   = '';
 let timerInterval  = null;
 let timerSec       = 0;
-let editProgId     = null;   // pour modal modifier
-let seanceProgId   = null;   // id_programme pour l'API
-let seanceDateDebut = null;  // timestamp ISO du démarrage
+let editProgId     = null;
+let seanceProgId   = null;
+let seanceDateDebut = null;
 
 // ═══════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════
 window.onload = () => { renderChips(); renderExos(); renderProgs(); };
+
+// Dropdown close on outside click
+document.addEventListener('click', e => {
+  document.querySelectorAll('.profile-dropdown.open').forEach(d => {
+    if (!d.contains(e.target)) d.classList.remove('open');
+  });
+});
 
 // ═══════════════════════════════════════════════════════════════
 // CHIPS
@@ -314,7 +343,6 @@ function filterExos() {
 
 function renderExos(list = EXERCICES) {
   const cont = document.getElementById('exo-list');
-  // IDs du programme en mode édition (pour marquer les déjà ajoutés)
   const inProgIds = modeEdition
     ? (programmes.find(p=>p.id===modeEdition)?.exoIds || [])
     : (seanceActive ? seanceExos.map(s=>s.exo.id) : []);
@@ -406,6 +434,17 @@ function toggleModeEdition(progId) {
 }
 
 function quitterModeEdition() {
+  if (modeEdition) {
+    const prog = programmes.find(p=>p.id===modeEdition);
+    if (prog && prog.custom) {
+      // Persister les exercices côté serveur
+      fetch(`/api/programme/${prog.id}/exercices`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ exoIds: prog.exoIds })
+      }).catch(err => console.error('Erreur sync exercices:', err));
+    }
+  }
   modeEdition = null;
   document.getElementById('mode-bar').classList.remove('show');
   renderProgs();
@@ -417,7 +456,6 @@ function quitterModeEdition() {
 // AJOUTER / RETIRER EXERCICE
 // ═══════════════════════════════════════════════════════════════
 function ajouterExo(id) {
-  // MODE 1 : édition programme perso
   if (modeEdition) {
     const prog = programmes.find(p=>p.id===modeEdition);
     if (!prog) return;
@@ -429,7 +467,6 @@ function ajouterExo(id) {
     showToast(`${exo.nom} ajouté au programme !`);
     return;
   }
-  // MODE 2 : séance active
   if (seanceActive) {
     const exo = EXERCICES.find(e=>e.id===id);
     if (seanceExos.find(s=>s.exo.id===id)) { showToast('Déjà dans la séance','warn'); return; }
@@ -498,7 +535,7 @@ function sauvegarderProgramme() {
   const nom  = document.getElementById('f-nom').value.trim();
   const desc = document.getElementById('f-desc').value.trim();
   const errEl = document.getElementById('err-nom');
-  // Validation
+
   if (!nom) {
     document.getElementById('f-nom').classList.add('err');
     errEl.style.display = 'block';
@@ -508,17 +545,34 @@ function sauvegarderProgramme() {
   errEl.style.display = 'none';
 
   if (editProgId) {
-    // Modifier programme existant
-    const prog = programmes.find(p=>p.id===editProgId);
-    if (prog) { prog.nom = nom; prog.desc = desc; }
-    showToast('Programme mis à jour ✓');
+    // Modifier programme existant (API)
+    fetch(`/api/programme/${editProgId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nom, desc })
+    }).then(r => r.json()).then(data => {
+      if (data.success) {
+        const prog = programmes.find(p=>p.id===editProgId);
+        if (prog) { prog.nom = nom; prog.desc = desc; }
+        renderProgs();
+        showToast('Programme mis à jour ✓');
+      }
+    }).catch(() => showToast('Erreur réseau', 'err'));
   } else {
-    // Créer nouveau programme
-    programmes.push({id:Date.now(), nom, desc, custom:true, exoIds:[]});
-    showToast('Programme créé !');
+    // Créer nouveau programme (API)
+    fetch('/api/programme', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nom, desc })
+    }).then(r => r.json()).then(data => {
+      if (data.success) {
+        programmes.push({id: data.id, nom, desc, custom: true, exoIds: []});
+        renderProgs();
+        showToast('Programme créé !');
+      }
+    }).catch(() => showToast('Erreur réseau', 'err'));
   }
   closeModal();
-  renderProgs();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -526,18 +580,25 @@ function sauvegarderProgramme() {
 // ═══════════════════════════════════════════════════════════════
 function supprimerProg(id) {
   if (!confirm('Supprimer ce programme définitivement ?')) return;
-  programmes = programmes.filter(p=>p.id!==id);
-  if (progActif?.id===id) progActif=null;
-  if (modeEdition===id) quitterModeEdition();
-  renderProgs();
-  showToast('Programme supprimé');
+  fetch(`/api/programme/${id}`, { method: 'DELETE' })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        programmes = programmes.filter(p=>p.id!==id);
+        if (progActif?.id===id) progActif=null;
+        if (modeEdition===id) { modeEdition=null; document.getElementById('mode-bar').classList.remove('show'); }
+        renderProgs();
+        renderExos();
+        showToast('Programme supprimé');
+      }
+    }).catch(() => showToast('Erreur réseau', 'err'));
 }
 
 // ═══════════════════════════════════════════════════════════════
 // SÉANCE
 // ═══════════════════════════════════════════════════════════════
 function demarrerSeance(progId) {
-  quitterModeEdition();
+  if (modeEdition) quitterModeEdition();
   const prog = programmes.find(p=>p.id===progId);
   progActif = prog;
   seanceActive = true;
@@ -624,7 +685,6 @@ function renderSeance() {
     </div>`).join('');
 }
 
-// VALIDATION INPUTS
 function val(input, min, max) {
   const v = parseFloat(input.value);
   if (input.value!=='' && (isNaN(v)||v<min||v>max)) {
@@ -640,19 +700,12 @@ function terminerSeance() {
   if (!seanceActive) { showToast('Aucune séance en cours','warn'); return; }
   if (!seanceExos.length) { showToast('Ajoute au moins un exercice','warn'); return; }
 
-  // Validation : tous les poids et reps doivent être remplis
   let ok = true;
   seanceExos.forEach(({series})=>series.forEach(s=>{if(!s.poids||!s.reps)ok=false;}));
   if (!ok) { showToast('⚠️ Remplis tous les poids et reps','warn'); return; }
 
-  // Construire la date de fin et la durée
   const dateFin = new Date().toISOString().slice(0, 19);
-  const heures   = String(Math.floor(timerSec / 3600)).padStart(2, '0');
-  const minutes  = String(Math.floor((timerSec % 3600) / 60)).padStart(2, '0');
-  const secondes = String(timerSec % 60).padStart(2, '0');
-  const duree = `${heures}:${minutes}:${secondes}`;
 
-  // Construire le tableau de séries pour l'API
   const seriesPayload = [];
   seanceExos.forEach(({exo, series}) => {
     series.forEach(s => {
@@ -666,48 +719,36 @@ function terminerSeance() {
     });
   });
 
-  // Payload JSON
   const payload = {
     id_programme: seanceProgId,
     date_debut:   seanceDateDebut,
     date_fin:     dateFin,
-    duree:        duree,
     series:       seriesPayload
   };
 
-  // Envoi au serveur
   fetch('/api/seance', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   })
   .then(res => {
-    if (res.status === 401) {
-      showToast('⚠️ Connecte-toi pour sauvegarder', 'err');
-      throw new Error('Non authentifié');
-    }
+    if (res.status === 401) { showToast('⚠️ Connecte-toi pour sauvegarder', 'err'); throw new Error('401'); }
     return res.json();
   })
   .then(data => {
-    if (data.success) {
-      showToast('✅ Séance enregistrée !');
-    } else {
-      showToast('⚠️ ' + (data.error || 'Erreur'), 'err');
-    }
+    if (data.success) showToast('✅ Séance enregistrée !');
+    else showToast('⚠️ ' + (data.error || 'Erreur'), 'err');
   })
   .catch(err => {
-    console.error('Erreur API:', err);
-    if (err.message !== 'Non authentifié') {
-      showToast('❌ Erreur réseau', 'err');
-    }
+    if (err.message !== '401') showToast('❌ Erreur réseau', 'err');
   })
   .finally(() => {
     clearInterval(timerInterval);
-    seanceActive    = false;
-    seanceExos      = [];
-    seanceProgId    = null;
+    seanceActive = false;
+    seanceExos = [];
+    seanceProgId = null;
     seanceDateDebut = null;
-    timerSec        = 0;
+    timerSec = 0;
     document.getElementById('timer').textContent = '00:00';
     document.getElementById('seance-prog-name').textContent = '— Aucun programme';
     renderSeance();
@@ -719,11 +760,11 @@ function annulerSeance() {
   if (!seanceActive) return;
   if (!confirm('Annuler la séance en cours ?')) return;
   clearInterval(timerInterval);
-  seanceActive    = false;
-  seanceExos      = [];
-  seanceProgId    = null;
+  seanceActive = false;
+  seanceExos = [];
+  seanceProgId = null;
   seanceDateDebut = null;
-  timerSec        = 0;
+  timerSec = 0;
   document.getElementById('timer').textContent = '00:00';
   document.getElementById('seance-prog-name').textContent = '— Aucun programme';
   renderSeance();
@@ -742,12 +783,10 @@ function showToast(msg, type='') {
   toastTimer = setTimeout(()=>t.classList.remove('show'), 2800);
 }
 
-// Fermer modal en cliquant dehors
 document.getElementById('modal-prog').addEventListener('click', function(e){
   if(e.target===this) closeModal();
 });
 
-// Enter dans le champ nom
 document.getElementById('f-nom').addEventListener('keydown', e=>{
   if(e.key==='Enter') sauvegarderProgramme();
 });

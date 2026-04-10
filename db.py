@@ -6,17 +6,15 @@ Connexion MySQL brute via mysql.connector (pas d'ORM).
 import mysql.connector
 from mysql.connector import pooling
 
-# ── Configuration ──────────────────────────────────────────────
 DB_CONFIG = {
     'host':     'localhost',
     'user':     'root',
-    'password': 'Melvin08042006%',           # à adapter selon votre environnement
+    'password': 'Melvin08042006%',
     'database': 'db_local',
     'charset':  'utf8mb4',
-    'autocommit': False,      # on gère les transactions manuellement
+    'autocommit': False,
 }
 
-# Pool de 5 connexions réutilisables
 _pool = pooling.MySQLConnectionPool(
     pool_name='irontrack_pool',
     pool_size=5,

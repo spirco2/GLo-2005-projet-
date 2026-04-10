@@ -21,498 +21,137 @@
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
+    nav { display:flex; justify-content:space-between; align-items:center; padding:1.1rem 2rem; background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100 }
+    .logo { font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:800; color:var(--accent); text-decoration:none }
+    .nav-links { display:flex; gap:1.8rem; list-style:none }
+    .nav-links a { text-decoration:none; color:var(--muted); font-size:.88rem; font-weight:500; transition:color .2s }
+    .nav-links a:hover,.nav-links a.active { color:var(--text) }
+    .nav-right { display:flex; gap:.7rem; align-items:center }
+    .btn { padding:.5rem 1.1rem; border-radius:8px; font-family:'Inter',sans-serif; font-size:.85rem; font-weight:600; cursor:pointer; border:none; transition:all .2s }
+    .btn-ghost { background:transparent; border:1px solid var(--border); color:var(--text) }
+    .btn-ghost:hover { border-color:var(--text) }
+    .nav-avatar { width:32px; height:32px; border-radius:50%; background:var(--accent); color:#111; display:grid; place-items:center; font-weight:700; font-size:.8rem; flex-shrink:0; cursor:pointer }
 
-    /* ── NAV ── */
-    nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.1rem 2rem;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
+    .profile-dropdown { position:relative }
+    .dropdown-menu { display:none; position:absolute; top:44px; right:0; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); min-width:200px; box-shadow:0 12px 40px rgba(0,0,0,.5); z-index:200; overflow:hidden }
+    .profile-dropdown.open .dropdown-menu { display:block }
+    .dropdown-header { padding:.9rem 1rem .5rem; font-weight:700; font-size:.82rem; color:var(--accent); border-bottom:1px solid var(--border) }
+    .dropdown-item { display:block; padding:.6rem 1rem; font-size:.82rem; color:var(--text); text-decoration:none; transition:background .15s }
+    .dropdown-item:hover { background:var(--surface2) }
+    .dropdown-danger { color:var(--red) }
+    .dropdown-danger:hover { background:rgba(248,113,113,.08) }
+    .dropdown-divider { border-top:1px solid var(--border); margin:.3rem 0 }
 
-    .logo {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.3rem;
-      font-weight: 800;
-      color: var(--accent);
-      text-decoration: none;
-    }
+    .hamburger { display:none; background:none; border:none; color:var(--text); font-size:1.4rem; cursor:pointer }
+    .login-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:200; align-items:center; justify-content:center }
+    .login-overlay.open { display:flex }
+    .form-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem }
+    .form-group { margin-bottom:.9rem }
+    .form-group label { display:block; font-size:.72rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:.35rem }
+    .btn-accent { background:var(--accent); color:#111 }
 
-    .nav-links { display: flex; gap: 1.8rem; list-style: none; }
-    .nav-links a {
-      text-decoration: none;
-      color: var(--muted);
-      font-size: .88rem;
-      font-weight: 500;
-      transition: color .2s;
-    }
-    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .page-header { max-width:900px; margin:0 auto; padding:2.5rem 2rem 0 }
+    .page-header h1 { font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:800; margin-bottom:.3rem }
+    .page-header p { font-size:.82rem; color:var(--muted); margin-bottom:2rem }
 
-    .nav-right { display: flex; gap: .7rem; align-items: center; }
+    .profile-banner { max-width:900px; margin:0 auto 1.8rem; padding:0 2rem }
+    .profile-banner-inner { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem 1.8rem; display:flex; align-items:center; gap:1.2rem }
+    .profile-avatar { width:52px; height:52px; border-radius:50%; background:var(--accent); color:#111; display:grid; place-items:center; font-family:'Syne',sans-serif; font-weight:800; font-size:1.3rem; flex-shrink:0 }
+    .profile-info { flex:1 }
+    .profile-name { font-weight:700; font-size:1rem }
+    .profile-handle { font-size:.78rem; color:var(--muted); margin-top:.1rem }
+    .profile-stats { display:flex; gap:1.8rem }
+    .profile-stat { text-align:center }
+    .profile-stat-val { font-family:'Syne',sans-serif; font-weight:800; font-size:1.15rem }
+    .profile-stat-label { font-size:.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:.3px; margin-top:.1rem }
 
-    .nav-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #111;
-      display: grid;
-      place-items: center;
-      font-weight: 700;
-      font-size: .8rem;
-      flex-shrink: 0;
-    }
+    .empty-state { text-align:center; padding:3rem 1rem; color:var(--muted) }
+    .empty-state-icon { font-size:2.5rem; margin-bottom:.8rem }
+    .empty-state-title { font-weight:700; font-size:.95rem; color:var(--text); margin-bottom:.3rem }
+    .empty-state-text { font-size:.82rem; max-width:350px; margin:0 auto; line-height:1.6 }
 
-    .btn {
-      padding: .5rem 1.1rem;
-      border-radius: 8px;
-      font-family: 'Inter', sans-serif;
-      font-size: .85rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      transition: all .2s;
-    }
-    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
-    .btn-ghost:hover { border-color: var(--text); }
+    .stats-section { max-width:900px; margin:0 auto; padding:0 2rem 2rem }
+    .score-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.7rem; margin-bottom:1rem }
+    .score-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.4rem 1.3rem; transition:border-color .2s; position:relative; overflow:hidden }
+    .score-card:hover { border-color:var(--accent) }
+    .score-card-icon { font-size:1.1rem; margin-bottom:.8rem }
+    .score-card-value { font-family:'Syne',sans-serif; font-size:2rem; font-weight:800; line-height:1; margin-bottom:.25rem }
+    .score-card-label { font-size:.72rem; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.4px }
 
-    .hamburger { display: none; background: none; border: none; color: var(--text); font-size: 1.4rem; cursor: pointer; }
+    .chart-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.8rem; margin-bottom:1rem }
+    .chart-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.6rem }
+    .chart-title { font-weight:700; font-size:.95rem }
+    .chart-tabs { display:flex; gap:0; background:var(--surface2); border-radius:8px; padding:3px }
+    .chart-tab { font-size:.75rem; font-weight:600; padding:.35rem .9rem; border-radius:6px; cursor:pointer; color:var(--muted); background:none; border:none; font-family:'Inter',sans-serif; transition:all .2s }
+    .chart-tab.active { background:var(--accent); color:#111 }
+    .chart-tab:hover:not(.active) { color:var(--text) }
+    .chart-period-tag { font-size:.72rem; color:var(--muted); background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:.3rem .7rem }
 
-    /* ── PAGE HEADER ── */
-    .page-header {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 2.5rem 2rem 0;
-    }
+    .chart-area { display:flex; align-items:flex-end; gap:.45rem; height:200px; padding-top:1rem; border-bottom:1px solid var(--border); position:relative }
+    .chart-area::before { content:''; position:absolute; inset:0; background:repeating-linear-gradient(to bottom,transparent,transparent calc(25% - 1px),var(--border) calc(25% - 1px),var(--border) 25%); opacity:.35; pointer-events:none }
+    .y-axis { position:absolute; left:-2rem; top:0; bottom:0; display:flex; flex-direction:column; justify-content:space-between; padding:.2rem 0 }
+    .y-axis span { font-size:.6rem; color:var(--muted); font-weight:500 }
+    .bar-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:.4rem; position:relative; z-index:1 }
+    .bar { width:100%; max-width:36px; border-radius:5px 5px 2px 2px; background:var(--accent); position:relative; min-height:3px; transition:all .3s ease; animation:growBar .7s ease-out both }
+    .bar:hover { filter:brightness(1.2); box-shadow:0 0 12px rgba(232,255,71,.2) }
+    .bar::after { content:attr(data-tip); position:absolute; top:-26px; left:50%; transform:translateX(-50%) scale(.9); background:var(--surface); border:1px solid var(--border); color:var(--accent); font-size:.68rem; font-weight:600; padding:2px 7px; border-radius:5px; opacity:0; pointer-events:none; transition:all .15s ease; white-space:nowrap }
+    .bar:hover::after { opacity:1; transform:translateX(-50%) scale(1) }
+    @keyframes growBar { from { transform:scaleY(0); transform-origin:bottom } to { transform:scaleY(1); transform-origin:bottom } }
+    .bar-week { font-size:.65rem; color:var(--muted); font-weight:500 }
+    .chart-legend { display:flex; gap:1.4rem; margin-top:1rem; padding-top:.8rem }
+    .legend-item { display:flex; align-items:center; gap:.35rem; font-size:.72rem; color:var(--muted) }
+    .legend-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0 }
 
-    .page-header h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.6rem;
-      font-weight: 800;
-      margin-bottom: .3rem;
-    }
+    .bottom-grid { display:grid; grid-template-columns:1fr 1fr; gap:.7rem }
+    .calendar-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem }
+    .calendar-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem }
+    .calendar-header h3 { font-size:.9rem; font-weight:700 }
+    .calendar-nav { display:flex; gap:.3rem }
+    .calendar-nav button { width:28px; height:28px; border-radius:6px; border:1px solid var(--border); background:var(--surface2); color:var(--muted); cursor:pointer; font-size:.75rem; display:grid; place-items:center; transition:all .2s }
+    .calendar-nav button:hover { border-color:var(--text); color:var(--text) }
+    .calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; text-align:center }
+    .cal-day-name { font-size:.62rem; font-weight:600; color:var(--muted); text-transform:uppercase; padding:.3rem 0 }
+    .cal-day { font-size:.78rem; padding:.45rem .2rem; border-radius:6px; color:var(--muted); cursor:default }
+    .cal-day.current-month { color:var(--text) }
+    .cal-day.today { background:var(--accent); color:#111; font-weight:700 }
+    .cal-day.has-workout { position:relative }
+    .cal-day.has-workout::after { content:''; position:absolute; bottom:3px; left:50%; transform:translateX(-50%); width:4px; height:4px; border-radius:50%; background:var(--green) }
 
-    .page-header p {
-      font-size: .82rem;
-      color: var(--muted);
-      margin-bottom: 2rem;
-    }
+    .recent-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem }
+    .recent-card h3 { font-size:.9rem; font-weight:700; margin-bottom:1rem }
+    .workout-row { display:flex; align-items:center; justify-content:space-between; padding:.7rem 0; border-bottom:1px solid var(--border) }
+    .workout-row:last-child { border-bottom:none }
+    .workout-name { font-size:.82rem; font-weight:600 }
+    .workout-meta { font-size:.7rem; color:var(--muted); margin-top:.1rem }
+    .workout-dur { font-size:.75rem; font-weight:600; color:var(--accent); white-space:nowrap }
 
-    /* ── PROFILE BANNER ── */
-    .profile-banner {
-      max-width: 900px;
-      margin: 0 auto 1.8rem;
-      padding: 0 2rem;
-    }
-
-    .profile-banner-inner {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem 1.8rem;
-      display: flex;
-      align-items: center;
-      gap: 1.2rem;
-    }
-
-    .profile-avatar {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #111;
-      display: grid;
-      place-items: center;
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 1.3rem;
-      flex-shrink: 0;
-    }
-
-    .profile-info { flex: 1; }
-    .profile-name { font-weight: 700; font-size: 1rem; }
-    .profile-handle { font-size: .78rem; color: var(--muted); margin-top: .1rem; }
-
-    .profile-stats { display: flex; gap: 1.8rem; }
-    .profile-stat { text-align: center; }
-    .profile-stat-val { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.15rem; }
-    .profile-stat-label { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .3px; margin-top: .1rem; }
-
-    /* ── EMPTY STATE ── */
-    .empty-state {
-      text-align: center;
-      padding: 3rem 1rem;
-      color: var(--muted);
-    }
-
-    .empty-state-icon { font-size: 2.5rem; margin-bottom: .8rem; }
-    .empty-state-title { font-weight: 700; font-size: .95rem; color: var(--text); margin-bottom: .3rem; }
-    .empty-state-text { font-size: .82rem; max-width: 350px; margin: 0 auto; line-height: 1.6; }
-
-    /* ── SCORE CARDS ── */
-    .stats-section {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 0 2rem 2rem;
-    }
-
-    .score-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: .7rem;
-      margin-bottom: 1rem;
-    }
-
-    .score-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.4rem 1.3rem;
-      transition: border-color .2s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .score-card:hover { border-color: var(--accent); }
-    .score-card-icon { font-size: 1.1rem; margin-bottom: .8rem; }
-
-    .score-card-value {
-      font-family: 'Syne', sans-serif;
-      font-size: 2rem;
-      font-weight: 800;
-      line-height: 1;
-      margin-bottom: .25rem;
-    }
-
-    .score-card-label {
-      font-size: .72rem;
-      color: var(--muted);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: .4px;
-    }
-
-    /* ── CHART CARD ── */
-    .chart-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.8rem;
-      margin-bottom: 1rem;
-    }
-
-    .chart-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.6rem;
-    }
-
-    .chart-title { font-weight: 700; font-size: .95rem; }
-
-    .chart-tabs {
-      display: flex;
-      gap: 0;
-      background: var(--surface2);
-      border-radius: 8px;
-      padding: 3px;
-    }
-
-    .chart-tab {
-      font-size: .75rem;
-      font-weight: 600;
-      padding: .35rem .9rem;
-      border-radius: 6px;
-      cursor: pointer;
-      color: var(--muted);
-      background: none;
-      border: none;
-      font-family: 'Inter', sans-serif;
-      transition: all .2s;
-    }
-
-    .chart-tab.active { background: var(--accent); color: #111; }
-    .chart-tab:hover:not(.active) { color: var(--text); }
-
-    .chart-period-tag {
-      font-size: .72rem;
-      color: var(--muted);
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: .3rem .7rem;
-    }
-
-    /* ── BAR CHART ── */
-    .chart-area {
-      display: flex;
-      align-items: flex-end;
-      gap: .45rem;
-      height: 200px;
-      padding-top: 1rem;
-      border-bottom: 1px solid var(--border);
-      position: relative;
-    }
-
-    .chart-area::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: repeating-linear-gradient(
-        to bottom, transparent, transparent calc(25% - 1px),
-        var(--border) calc(25% - 1px), var(--border) 25%
-      );
-      opacity: .35;
-      pointer-events: none;
-    }
-
-    .y-axis {
-      position: absolute;
-      left: -2rem;
-      top: 0; bottom: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: .2rem 0;
-    }
-
-    .y-axis span { font-size: .6rem; color: var(--muted); font-weight: 500; }
-
-    .bar-col {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: .4rem;
-      position: relative;
-      z-index: 1;
-    }
-
-    .bar {
-      width: 100%;
-      max-width: 36px;
-      border-radius: 5px 5px 2px 2px;
-      background: var(--accent);
-      position: relative;
-      min-height: 3px;
-      transition: all .3s ease;
-      animation: growBar .7s ease-out both;
-    }
-
-    .bar:hover {
-      filter: brightness(1.2);
-      box-shadow: 0 0 12px rgba(232,255,71,.2);
-    }
-
-    .bar::after {
-      content: attr(data-tip);
-      position: absolute;
-      top: -26px; left: 50%;
-      transform: translateX(-50%) scale(.9);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--accent);
-      font-size: .68rem;
-      font-weight: 600;
-      padding: 2px 7px;
-      border-radius: 5px;
-      opacity: 0;
-      pointer-events: none;
-      transition: all .15s ease;
-      white-space: nowrap;
-    }
-
-    .bar:hover::after { opacity: 1; transform: translateX(-50%) scale(1); }
-
-    @keyframes growBar {
-      from { transform: scaleY(0); transform-origin: bottom; }
-      to   { transform: scaleY(1); transform-origin: bottom; }
-    }
-
-    .bar-week { font-size: .65rem; color: var(--muted); font-weight: 500; }
-
-    .chart-legend {
-      display: flex;
-      gap: 1.4rem;
-      margin-top: 1rem;
-      padding-top: .8rem;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: .35rem;
-      font-size: .72rem;
-      color: var(--muted);
-    }
-
-    .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-
-    /* ── BOTTOM GRID ── */
-    .bottom-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: .7rem;
-    }
-
-    /* ── CALENDAR ── */
-    .calendar-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-    }
-
-    .calendar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-
-    .calendar-header h3 { font-size: .9rem; font-weight: 700; }
-
-    .calendar-nav { display: flex; gap: .3rem; }
-
-    .calendar-nav button {
-      width: 28px; height: 28px;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      background: var(--surface2);
-      color: var(--muted);
-      cursor: pointer;
-      font-size: .75rem;
-      display: grid;
-      place-items: center;
-      transition: all .2s;
-    }
-    .calendar-nav button:hover { border-color: var(--text); color: var(--text); }
-
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 2px;
-      text-align: center;
-    }
-
-    .cal-day-name {
-      font-size: .62rem;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      padding: .3rem 0;
-    }
-
-    .cal-day {
-      font-size: .78rem;
-      padding: .45rem .2rem;
-      border-radius: 6px;
-      color: var(--muted);
-      cursor: default;
-    }
-
-    .cal-day.current-month { color: var(--text); }
-
-    .cal-day.today {
-      background: var(--accent);
-      color: #111;
-      font-weight: 700;
-    }
-
-    .cal-day.has-workout { position: relative; }
-    .cal-day.has-workout::after {
-      content: '';
-      position: absolute;
-      bottom: 3px; left: 50%;
-      transform: translateX(-50%);
-      width: 4px; height: 4px;
-      border-radius: 50%;
-      background: var(--green);
-    }
-
-    /* ── RECENT WORKOUTS ── */
-    .recent-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-    }
-
-    .recent-card h3 { font-size: .9rem; font-weight: 700; margin-bottom: 1rem; }
-
-    .workout-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: .7rem 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .workout-row:last-child { border-bottom: none; }
-
-    .workout-name { font-size: .82rem; font-weight: 600; }
-    .workout-meta { font-size: .7rem; color: var(--muted); margin-top: .1rem; }
-    .workout-dur { font-size: .75rem; font-weight: 600; color: var(--accent); white-space: nowrap; }
-
-    footer {
-      text-align: center;
-      padding: 2rem;
-      font-size: .75rem;
-      color: var(--muted);
-      border-top: 1px solid var(--border);
-      margin-top: 2rem;
-    }
+    footer { text-align:center; padding:2rem; font-size:.75rem; color:var(--muted); border-top:1px solid var(--border); margin-top:2rem }
 
     @media (max-width: 768px) {
-      .nav-links {
-        position: fixed; top: 60px; left: 0; right: 0;
-        background: var(--surface); border-bottom: 1px solid var(--border);
-        flex-direction: column; padding: 1rem 2rem; gap: .6rem;
-        transform: translateY(-120%); transition: transform .3s ease;
-      }
-      .nav-links.open { transform: translateY(0); }
-      .hamburger { display: block; }
-      .page-header, .profile-banner, .stats-section { padding-left: 1.2rem; padding-right: 1.2rem; }
-      .page-header h1 { font-size: 1.3rem; }
-      .score-grid { grid-template-columns: 1fr; }
-      .score-card { display: flex; align-items: center; gap: .8rem; padding: 1.1rem; }
-      .score-card-icon { margin-bottom: 0; }
-      .score-card-value { font-size: 1.4rem; }
-      .bottom-grid { grid-template-columns: 1fr; }
-      .chart-area { height: 150px; }
-      .bar { max-width: 22px; }
-      .profile-banner-inner { flex-wrap: wrap; }
-      .profile-stats { gap: 1.2rem; }
-      .chart-header { flex-direction: column; align-items: flex-start; gap: .6rem; }
+      .nav-links { position:fixed; top:60px; left:0; right:0; background:var(--surface); border-bottom:1px solid var(--border); flex-direction:column; padding:1rem 2rem; gap:.6rem; transform:translateY(-120%); transition:transform .3s ease }
+      .nav-links.open { transform:translateY(0) }
+      .hamburger { display:block }
+      .page-header,.profile-banner,.stats-section { padding-left:1.2rem; padding-right:1.2rem }
+      .page-header h1 { font-size:1.3rem }
+      .score-grid { grid-template-columns:1fr }
+      .score-card { display:flex; align-items:center; gap:.8rem; padding:1.1rem }
+      .score-card-icon { margin-bottom:0 }
+      .score-card-value { font-size:1.4rem }
+      .bottom-grid { grid-template-columns:1fr }
+      .chart-area { height:150px }
+      .bar { max-width:22px }
+      .profile-banner-inner { flex-wrap:wrap }
+      .profile-stats { gap:1.2rem }
+      .chart-header { flex-direction:column; align-items:flex-start; gap:.6rem }
     }
   </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav>
-  <a href="/" class="logo">IronTrack</a>
-  <ul class="nav-links" id="navLinks">
-    <li><a href="/">Accueil</a></li>
-    <li><a href="/securite">Sécurité</a></li>
-    <li><a href="/stats" class="active">Statistiques</a></li>
-  </ul>
-  <div class="nav-right">
-    <div class="nav-avatar" id="nav-avatar">{{ user.pseudo[:2]|upper if user else '' }}</div>
-    <button class="hamburger" id="hamburger" aria-label="Menu">☰</button>
-  </div>
-</nav>
+{% set active_page = 'statistiques' %}
+{% include 'navbar.html' %}
 
 <div class="page-header">
   <h1>Statistiques</h1>
@@ -522,18 +161,18 @@
 <!-- PROFILE BANNER -->
 <div class="profile-banner">
   <div class="profile-banner-inner">
-    <div class="profile-avatar" id="profile-avatar">{{ user.pseudo[:2]|upper if user else '' }}</div>
+    <div class="profile-avatar">{{ user.pseudo[:2]|upper if user else '' }}</div>
     <div class="profile-info">
-      <div class="profile-name" id="profile-name">{{ user.pseudo if user else '—' }}</div>
-      <div class="profile-handle" id="profile-handle">@{{ user.pseudo if user else '—' }}</div>
+      <div class="profile-name">{{ user.pseudo if user else '—' }}</div>
+      <div class="profile-handle">@{{ user.pseudo if user else '—' }}</div>
     </div>
     <div class="profile-stats">
       <div class="profile-stat">
-        <div class="profile-stat-val" id="stat-workouts">{{ stats.nb_seances }}</div>
+        <div class="profile-stat-val">{{ stats.nb_seances }}</div>
         <div class="profile-stat-label">Séances</div>
       </div>
       <div class="profile-stat">
-        <div class="profile-stat-val" id="stat-streak">{{ stats.streak_semaines }}</div>
+        <div class="profile-stat-val">{{ stats.streak_semaines }}</div>
         <div class="profile-stat-label">Semaines d'affilée</div>
       </div>
     </div>
@@ -543,32 +182,32 @@
 
 <div class="stats-section">
 
-  <!-- ─── Score Cards ─── -->
+  <!-- Score Cards -->
   <div class="score-grid">
     <div class="score-card">
       <div class="score-card-icon">🏋️</div>
       <div>
-        <div class="score-card-value" id="card-volume">{{ '{:,.0f}'.format(stats.volume_total) }}</div>
+        <div class="score-card-value">{{ '{:,.0f}'.format(stats.volume_total) }}</div>
         <div class="score-card-label">Volume total (kg)</div>
       </div>
     </div>
     <div class="score-card">
       <div class="score-card-icon">📅</div>
       <div>
-        <div class="score-card-value" id="card-seances">{{ stats.nb_seances }}</div>
+        <div class="score-card-value">{{ stats.nb_seances }}</div>
         <div class="score-card-label">Nombre de séances</div>
       </div>
     </div>
     <div class="score-card">
       <div class="score-card-icon">⏱️</div>
       <div>
-        <div class="score-card-value" id="card-temps">{{ stats.temps_total_min }}</div>
-        <div class="score-card-label">Temps total (min)</div>
+        <div class="score-card-value">{{ stats.temps_total_sec | duree_humaine }}</div>
+        <div class="score-card-label">Temps total</div>
       </div>
     </div>
   </div>
 
-  <!-- ─── Progression Chart ─── -->
+  <!-- Progression Chart -->
   <div class="chart-card">
     <div class="chart-header">
       <div class="chart-title">Progression hebdomadaire</div>
@@ -581,13 +220,13 @@
       </div>
     </div>
 
-    <div class="chart-area" style="margin-left:2rem" id="chart-bars">
+    <div class="chart-area" style="margin-left:2rem">
       <div class="y-axis"><span>7h</span><span>5h</span><span>3h</span><span>1h</span><span></span></div>
       {% if stats.weekly_data %}
         {% for week in stats.weekly_data %}
           <div class="bar-col">
             <div class="bar accent" style="height:{{ week.pct }}%" data-tip="{{ week.minutes }} min"></div>
-            <span class="bar-week">{{ week.label }}</span>
+            <span class="bar-week">{{ week.label_date | datefr }}</span>
           </div>
         {% endfor %}
       {% else %}
@@ -607,7 +246,7 @@
     </div>
   </div>
 
-  <!-- ─── Calendar + Recent Workouts ─── -->
+  <!-- Calendar + Recent Workouts -->
   <div class="bottom-grid">
     <div class="calendar-card">
       <div class="calendar-header">
@@ -639,9 +278,9 @@
           <div class="workout-row">
             <div>
               <div class="workout-name">{{ w.name }}</div>
-              <div class="workout-meta">{{ w.date }} · {{ w.nb_exercises }} exercices</div>
+              <div class="workout-meta">{{ w.date_debut | datefr }} · {{ w.nb_exercises }} exercices</div>
             </div>
-            <div class="workout-dur">{{ w.duration }}</div>
+            <div class="workout-dur">{{ w.duree_sec | duree_humaine }}</div>
           </div>
           {% endfor %}
         {% else %}
@@ -662,12 +301,15 @@
 </footer>
 
 <script>
-  // Hamburger
-  document.getElementById('hamburger').addEventListener('click', () => {
-    document.getElementById('navLinks').classList.toggle('open');
+  const hb = document.getElementById('hamburger');
+  if (hb) hb.addEventListener('click', () => document.getElementById('navLinks').classList.toggle('open'));
+
+  document.addEventListener('click', e => {
+    document.querySelectorAll('.profile-dropdown.open').forEach(d => {
+      if (!d.contains(e.target)) d.classList.remove('open');
+    });
   });
 
-  // Tab switching (visual only)
   document.querySelectorAll('.chart-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
@@ -675,43 +317,26 @@
     });
   });
 
-  // Calendrier — généré côté client avec les jours de séance injectés par Flask
+  // Calendrier
   (function() {
     const calEl = document.getElementById('calendar-grid');
     if (!calEl) return;
-
+    const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
     let joursAvecSeance = [];
-    try {
-      joursAvecSeance = JSON.parse(calEl.dataset.jours || '[]');
-    } catch { return; }
-
-    const today    = new Date();
-    const annee    = today.getFullYear();
-    const mois     = today.getMonth();
+    try { joursAvecSeance = JSON.parse(calEl.dataset.jours || '[]'); } catch { return; }
+    const today = new Date();
+    const annee = today.getFullYear();
+    const mois = today.getMonth();
     const premierJ = new Date(annee, mois, 1).getDay();
-    const nbJours  = new Date(annee, mois + 1, 0).getDate();
-
+    const nbJours = new Date(annee, mois + 1, 0).getDate();
     const moisLabel = document.getElementById('calendar-month');
-    if (moisLabel) {
-      moisLabel.textContent = today.toLocaleDateString('fr-CA', {
-        month: 'long',
-        year: 'numeric',
-      });
-    }
-
+    if (moisLabel) moisLabel.textContent = MOIS[mois] + ' ' + annee;
     let html = '';
-    for (let i = 0; i < premierJ; i++) {
-      html += '<span class="cal-day"></span>';
-    }
+    for (let i = 0; i < premierJ; i++) html += '<span class="cal-day"></span>';
     for (let j = 1; j <= nbJours; j++) {
-      const isToday   = j === today.getDate();
+      const isToday = j === today.getDate();
       const hasSeance = joursAvecSeance.includes(j);
-      const classes   = [
-        'cal-day',
-        'current-month',
-        isToday   ? 'today'       : '',
-        hasSeance ? 'has-workout' : '',
-      ].filter(Boolean).join(' ');
+      const classes = ['cal-day','current-month', isToday?'today':'', hasSeance?'has-workout':''].filter(Boolean).join(' ');
       html += `<span class="${classes}">${j}</span>`;
     }
     calEl.innerHTML = calEl.innerHTML + html;

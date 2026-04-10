@@ -1,0 +1,259 @@
+/* =============================================================
+   IronTrack — style.css
+   Styles globaux partagés entre toutes les pages de l'app.
+   Chaque page HTML fait :  <link rel="stylesheet" href="/static/style.css"/>
+   ============================================================= */
+
+/* ── Variables ─────────────────────────────────────────────── */
+:root {
+  --bg:       #111111;
+  --surface:  #1a1a1a;
+  --surface2: #222222;
+  --border:   #2e2e2e;
+  --text:     #f0f0f0;
+  --muted:    #777777;
+  --muted2:   #999999;
+  --accent:   #e8ff47;       /* jaune-vert IronTrack */
+  --accent2:  #d4eb30;
+  --green:    #4ade80;
+  --red:      #f87171;
+  --orange:   #fb923c;
+  --purple:   #c084fc;
+  --radius:   12px;
+}
+
+/* ── Reset ──────────────────────────────────────────────────── */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* ── Typographie ────────────────────────────────────────────── */
+h1, h2, h3, h4 { line-height: 1.2; }
+
+a {
+  color: var(--text);
+  text-decoration: none;
+  transition: color .2s;
+}
+a:hover { color: var(--accent); }
+
+/* ── Boutons ────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  padding: .5rem 1.1rem;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all .2s;
+  white-space: nowrap;
+}
+
+.btn-accent  { background: var(--accent);  color: #111; }
+.btn-accent:hover { background: var(--accent2); }
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.btn-ghost:hover { border-color: var(--text); }
+
+.btn-danger {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--red);
+}
+.btn-danger:hover { border-color: var(--red); background: rgba(248,113,113,.08); }
+
+.btn-lg { padding: .75rem 1.8rem; font-size: .95rem; }
+.btn-sm { padding: .3rem .75rem;  font-size: .78rem; }
+
+/* ── Badges de difficulté ───────────────────────────────────── */
+.badge {
+  display: inline-block;
+  font-size: .68rem;
+  font-weight: 700;
+  padding: .2rem .6rem;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+.badge-d  { background: rgba(74,222,128,.12); color: var(--green); }
+.badge-i  { background: rgba(251,146,60,.12); color: var(--orange); }
+.badge-a  { background: rgba(248,113,113,.12); color: var(--red); }
+.badge-e  { background: rgba(192,132,252,.12); color: var(--purple); }
+.badge-grey { background: var(--surface2); color: var(--muted2); }
+
+/* ── Formulaires ────────────────────────────────────────────── */
+.form-group { margin-bottom: .9rem; }
+
+.form-group label {
+  display: block;
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-bottom: .35rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: .62rem .9rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: .88rem;
+  background: var(--surface2);
+  color: var(--text);
+  outline: none;
+  transition: border-color .2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--accent);
+}
+
+.form-group select option { background: var(--surface2); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+
+/* ── Alertes / Flash messages ───────────────────────────────── */
+.flash-container {
+  position: fixed;
+  top: 4.5rem;
+  right: 1.5rem;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  max-width: 360px;
+}
+
+.flash {
+  padding: .75rem 1.1rem;
+  border-radius: 8px;
+  font-size: .85rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  animation: slideIn .25s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.flash-success { background: rgba(74,222,128,.12); border-color: rgba(74,222,128,.3); color: var(--green); }
+.flash-error   { background: rgba(248,113,113,.12); border-color: rgba(248,113,113,.3); color: var(--red); }
+.flash-warning { background: rgba(251,146,60,.12);  border-color: rgba(251,146,60,.3);  color: var(--orange); }
+.flash-info    { background: rgba(192,132,252,.12); border-color: rgba(192,132,252,.3); color: var(--purple); }
+
+/* ── Navigation ─────────────────────────────────────────────── */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: -0.5px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.8rem;
+  list-style: none;
+}
+
+.nav-links a {
+  color: var(--muted);
+  font-size: .88rem;
+  font-weight: 500;
+}
+.nav-links a:hover,
+.nav-links a.active { color: var(--text); }
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+}
+
+/* Avatar initiales */
+.nav-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #111;
+  font-size: .75rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* ── Cards génériques ───────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  transition: border-color .2s;
+}
+.card:hover { border-color: #3a3a3a; }
+
+/* ── Divider ────────────────────────────────────────────────── */
+hr.div {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0 2rem;
+}
+
+/* ── Footer ─────────────────────────────────────────────────── */
+footer {
+  text-align: center;
+  padding: 2rem;
+  font-size: .75rem;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  margin-top: 2rem;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  nav { padding: .75rem 1rem; }
+  .nav-links { display: none; }
+  .form-row { grid-template-columns: 1fr; }
+}

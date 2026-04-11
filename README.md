@@ -19,7 +19,7 @@ Cette application illustre une architecture **3 tiers** avec :
 - **Outils** : Git, pycharm 
 
 ---
-
+//
 ## Fonctionnalités principales
 
 - **Gestion des utilisateurs**

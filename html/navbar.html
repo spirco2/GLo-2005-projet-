@@ -7,6 +7,7 @@
     {% if session.get('user_id') %}
       <li><a href="/programmes" class="{{ 'active' if active_page == 'programmes' else '' }}">Mes Programmes</a></li>
       <li><a href="/statistiques" class="{{ 'active' if active_page == 'statistiques' else '' }}">Statistiques</a></li>
+      <li><a href="/analyse" class="{{ 'active' if active_page == 'analyse' else '' }}">Analyse</a></li>
     {% endif %}
   </ul>
   <div class="nav-right">

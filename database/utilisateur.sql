@@ -80,4 +80,47 @@ CREATE INDEX idx_email  ON Utilisateurs(email);
 CREATE INDEX idx_pseudo ON Utilisateurs(pseudo);
 CREATE INDEX idx_sexe   ON Utilisateurs(sexe);
 
+-- =============================================
+-- REQUÊTES AVANCÉES (Évaluation GLO-2005)
+-- Table : Utilisateurs + jointures avec seance, serie_log
+-- =============================================
+
+-- 1. Répartition des utilisateurs par sexe (agrégation)
+SELECT sexe, COUNT(*) AS total
+FROM Utilisateurs
+GROUP BY sexe;
+
+-- 2. IMC moyen par sexe (agrégation + filtre NULL)
+SELECT sexe, ROUND(AVG(imc), 2) AS imc_moyen
+FROM Utilisateurs
+WHERE imc IS NOT NULL
+GROUP BY sexe;
+
+-- 3. Utilisateur avec l'IMC le plus élevé (sous-requête scalaire)
+SELECT pseudo, poids, taille, imc
+FROM Utilisateurs
+WHERE imc = (SELECT MAX(imc) FROM Utilisateurs);
+
+-- 4. Utilisateurs en surpoids — IMC > 25 (filtre + tri)
+SELECT pseudo, imc
+FROM Utilisateurs
+WHERE imc > 25
+ORDER BY imc DESC;
+
+-- 5. Utilisateurs sans aucune séance enregistrée
+--    (sous-requête NOT IN avec jointure implicite)
+SELECT pseudo, email
+FROM Utilisateurs
+WHERE id NOT IN (
+    SELECT DISTINCT id_user FROM seance
+);
+
+-- 6. Classement des utilisateurs par nombre de séances
+--    (sous-requête corrélée dans le SELECT)
+SELECT u.pseudo,
+       u.email,
+       (SELECT COUNT(*) FROM seance s WHERE s.id_user = u.id) AS nb_seances
+FROM Utilisateurs u
+ORDER BY nb_seances DESC;
+
 SET FOREIGN_KEY_CHECKS = 1;

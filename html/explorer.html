@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IronTrack — Explorer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #111;
+      --surface: #1a1a1a;
+      --surface2: #222;
+      --border: #2e2e2e;
+      --text: #f0f0f0;
+      --muted: #777;
+      --accent: #e8ff47;
+      --green: #4ade80;
+      --red: #f87171;
+      --orange: #fb923c;
+      --purple: #c084fc;
+      --radius: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* NAV */
+    nav { display:flex; justify-content:space-between; align-items:center; padding:1.1rem 2rem; background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100 }
+    .logo { font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:800; color:var(--accent); text-decoration:none }
+    .nav-links { display:flex; gap:1.8rem; list-style:none }
+    .nav-links a { text-decoration:none; color:var(--muted); font-size:.88rem; font-weight:500; transition:color .2s }
+    .nav-links a:hover,.nav-links a.active { color:var(--text) }
+    .nav-right { display:flex; gap:.7rem; align-items:center }
+    .btn { padding:.5rem 1.1rem; border-radius:8px; font-family:'Inter',sans-serif; font-size:.85rem; font-weight:600; cursor:pointer; border:none; transition:all .2s }
+    .btn-ghost { background:transparent; border:1px solid var(--border); color:var(--text) }
+    .btn-ghost:hover { border-color:var(--text) }
+    .btn-accent { background:var(--accent); color:#111 }
+    .btn-accent:hover { background:#d4eb30 }
+    .nav-avatar { width:32px; height:32px; border-radius:50%; background:var(--accent); color:#111; display:grid; place-items:center; font-weight:700; font-size:.8rem; flex-shrink:0; cursor:pointer }
+
+    /* DROPDOWN */
+    .profile-dropdown { position:relative }
+    .dropdown-menu { display:none; position:absolute; top:44px; right:0; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); min-width:200px; box-shadow:0 12px 40px rgba(0,0,0,.5); z-index:200; overflow:hidden }
+    .profile-dropdown.open .dropdown-menu { display:block }
+    .dropdown-header { padding:.9rem 1rem .5rem; font-weight:700; font-size:.82rem; color:var(--accent); border-bottom:1px solid var(--border) }
+    .dropdown-item { display:block; padding:.6rem 1rem; font-size:.82rem; color:var(--text); text-decoration:none; transition:background .15s }
+    .dropdown-item:hover { background:var(--surface2) }
+    .dropdown-danger { color:var(--red) }
+    .dropdown-danger:hover { background:rgba(248,113,113,.08) }
+    .dropdown-divider { border-top:1px solid var(--border); margin:.3rem 0 }
+
+    .login-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:200; align-items:center; justify-content:center }
+    .login-overlay.open { display:flex }
+    .form-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem }
+    .form-group { margin-bottom:.9rem }
+    .form-group label { display:block; font-size:.72rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:.35rem }
+
+    .hamburger { display:none; background:none; border:none; color:var(--text); font-size:1.4rem; cursor:pointer }
+
+    /* PAGE */
+    .page-header { max-width:1100px; margin:0 auto; padding:2.5rem 2rem 0 }
+    .page-header h1 { font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:800; margin-bottom:.3rem }
+    .page-header p { font-size:.82rem; color:var(--muted); margin-bottom:2rem }
+
+    .section { max-width:1100px; margin:0 auto; padding:0 2rem 2.5rem }
+    .section-title { font-family:'Syne',sans-serif; font-size:1.25rem; font-weight:800; margin-bottom:.3rem }
+    .section-sub { font-size:.82rem; color:var(--muted); margin-bottom:1.4rem }
+    hr.div { border:none; border-top:1px solid var(--border); margin:0 2rem 2rem }
+
+    /* PROGRAMMES */
+    .prog-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.7rem }
+    .prog-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.3rem; transition:border-color .2s }
+    .prog-card:hover { border-color:var(--accent) }
+    .prog-name { font-weight:700; font-size:.9rem; margin-bottom:.4rem }
+    .prog-desc { font-size:.75rem; color:var(--muted); line-height:1.5; margin-bottom:.7rem }
+    .prog-footer { display:flex; justify-content:space-between; align-items:center; margin-bottom:.7rem }
+    .prog-dur { font-size:.72rem; color:var(--muted) }
+    .prog-exos { display:flex; flex-wrap:wrap; gap:.25rem }
+    .prog-exo-tag { font-size:.65rem; background:rgba(255,255,255,.04); border:1px solid var(--border); color:var(--muted); padding:.15rem .4rem; border-radius:4px }
+
+    /* EXERCICES */
+    .filter-bar { display:flex; flex-wrap:wrap; gap:.35rem; margin-bottom:1.2rem }
+    .chip { font-size:.72rem; font-weight:600; padding:.25rem .7rem; border-radius:20px; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted); transition:all .2s; font-family:'Inter',sans-serif }
+    .chip:hover { border-color:#444; color:var(--text) }
+    .chip.on { background:var(--accent); border-color:var(--accent); color:#111 }
+
+    .search-bar { margin-bottom:1rem }
+    .search-bar input { width:100%; max-width:400px; background:var(--surface2); border:1px solid var(--border); color:var(--text); padding:.55rem .9rem; border-radius:8px; font-size:.85rem; font-family:'Inter',sans-serif; outline:none; transition:border-color .2s }
+    .search-bar input:focus { border-color:var(--accent) }
+    .search-bar input::placeholder { color:var(--muted) }
+
+    .ex-list { display:flex; flex-direction:column; gap:.5rem }
+    .ex-row { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.3rem; display:grid; grid-template-columns:2.5fr 1fr .8fr .8fr; align-items:center; gap:1rem; transition:border-color .2s }
+    .ex-row:hover { border-color:#3a3a3a }
+    .ex-nom { font-weight:600; font-size:.88rem }
+    .ex-desc { font-size:.72rem; color:var(--muted); margin-top:.15rem; line-height:1.4 }
+
+    .badge { font-size:.68rem; font-weight:600; padding:.2rem .6rem; border-radius:99px; white-space:nowrap }
+    .badge-grey { background:var(--surface2); color:var(--muted) }
+    .badge-d { background:rgba(74,222,128,.1); color:var(--green) }
+    .badge-i { background:rgba(251,146,60,.1); color:var(--orange) }
+    .badge-a { background:rgba(248,113,113,.1); color:var(--red) }
+    .badge-e { background:rgba(192,132,252,.1); color:var(--purple) }
+
+    .counter { font-size:.75rem; color:var(--muted); margin-bottom:1rem }
+
+    footer { text-align:center; padding:2rem; font-size:.75rem; color:var(--muted); border-top:1px solid var(--border); margin-top:2rem }
+
+    @media (max-width: 768px) {
+      .nav-links { position:fixed; top:60px; left:0; right:0; background:var(--surface); border-bottom:1px solid var(--border); flex-direction:column; padding:1rem 2rem; gap:.6rem; transform:translateY(-120%); transition:transform .3s ease }
+      .nav-links.open { transform:translateY(0) }
+      .hamburger { display:block }
+      .prog-grid { grid-template-columns:1fr }
+      .ex-row { grid-template-columns:1fr; gap:.4rem }
+      .page-header,.section { padding-left:1.2rem; padding-right:1.2rem }
+    }
+  </style>
+</head>
+<body>
+
+{% set active_page = 'explorer' %}
+{% include 'navbar.html' %}
+
+<div class="page-header">
+  <h1>Explorer</h1>
+  <p>Consultez nos programmes d'entraînement et parcourez le catalogue complet de 100 exercices.</p>
+</div>
+
+<!-- PROGRAMMES -->
+<div class="section">
+  <div class="section-title">Programmes d'entraînement</div>
+  <div class="section-sub">{{ programmes|length }} programmes avec exercices prédéfinis</div>
+  <div class="prog-grid">
+    {% for p in programmes %}
+    <div class="prog-card">
+      <div class="prog-name">{{ p.nom_programme }}</div>
+      <div class="prog-desc">{{ p.description_p or '' }}</div>
+      <div class="prog-footer">
+        <span class="prog-dur">{{ p.duree_semaines }} semaines · {{ p.nb_exercices }} exercices</span>
+      </div>
+      {% if p.exercices %}
+      <div class="prog-exos">
+        {% for ex in p.exercices %}
+          <span class="prog-exo-tag">{{ ex.nom }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<hr class="div"/>
+
+<!-- EXERCICES -->
+<div class="section">
+  <div class="section-title">Catalogue d'exercices</div>
+  <div class="section-sub">{{ exercices|length }} exercices avec description complète</div>
+
+  <div class="search-bar">
+    <input type="text" id="search-exo" placeholder="🔍 Rechercher un exercice..." oninput="filterExos()"/>
+  </div>
+
+  <div class="filter-bar" id="filter-chips">
+    <button class="chip on" onclick="filterMuscle(this,'')">Tous</button>
+    {% for m in muscles %}
+      <button class="chip" onclick="filterMuscle(this,'{{ m.nom_muscle }}')" data-muscle="{{ m.nom_muscle }}">{{ m.nom_muscle }}</button>
+    {% endfor %}
+  </div>
+
+  <div class="counter" id="exo-counter">{{ exercices|length }} exercices</div>
+
+  <div class="ex-list" id="exo-list">
+    {% for ex in exercices %}
+    <div class="ex-row" data-nom="{{ ex.nom|lower }}" data-muscles="{{ ex.muscles_strict or '' }}">
+      <div>
+        <div class="ex-nom">{{ ex.nom }}</div>
+        <div class="ex-desc">{{ ex.description or '' }}</div>
+      </div>
+      {% if ex.difficulte == 'Débutant' %}
+        <span class="badge badge-d">Débutant</span>
+      {% elif ex.difficulte == 'Intermédiaire' %}
+        <span class="badge badge-i">Intermédiaire</span>
+      {% elif ex.difficulte == 'Avancé' %}
+        <span class="badge badge-a">Avancé</span>
+      {% elif ex.difficulte == 'Expert' %}
+        <span class="badge badge-e">Expert</span>
+      {% else %}
+        <span class="badge badge-grey">{{ ex.difficulte }}</span>
+      {% endif %}
+      <span class="badge badge-grey">{{ ex.equipement or 'Aucun' }}</span>
+      <span class="badge badge-grey">{{ ex.muscles_display or '' }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<footer>
+  IronTrack — Projet GLO-2005 · Hachim · Melvin · Abdelali · Fabrice
+</footer>
+
+<script>
+  // Hamburger
+  const hb = document.getElementById('hamburger');
+  if (hb) hb.addEventListener('click', () => document.getElementById('navLinks').classList.toggle('open'));
+
+  // Dropdown
+  document.addEventListener('click', e => {
+    document.querySelectorAll('.profile-dropdown.open').forEach(d => {
+      if (!d.contains(e.target)) d.classList.remove('open');
+    });
+  });
+
+  // ── Filtrage strict par muscle individuel ──────────────────
+  let activeMuscle = '';
+
+  function filterMuscle(el, muscle) {
+    activeMuscle = muscle;
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+    el.classList.add('on');
+    filterExos();
+  }
+
+  function filterExos() {
+    const q = document.getElementById('search-exo').value.toLowerCase().trim();
+    const rows = document.querySelectorAll('#exo-list .ex-row');
+    let count = 0;
+
+    rows.forEach(row => {
+      const nom = row.dataset.nom || '';
+      // Split strict sur || → tableau de muscles exacts
+      const musclesArray = (row.dataset.muscles || '').split('||').filter(Boolean);
+
+      const matchQ = !q || nom.includes(q);
+      // Correspondance EXACTE : le muscle actif doit être dans le tableau
+      const matchMuscle = !activeMuscle || musclesArray.includes(activeMuscle);
+
+      const show = matchQ && matchMuscle;
+      row.style.display = show ? '' : 'none';
+      if (show) count++;
+    });
+
+    document.getElementById('exo-counter').textContent = count + ' exercice' + (count !== 1 ? 's' : '');
+  }
+</script>
+
+</body>
+</html>

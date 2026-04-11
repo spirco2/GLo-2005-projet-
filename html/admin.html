@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IronTrack — Analyse Avancée</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #111;
+      --surface: #1a1a1a;
+      --surface2: #222;
+      --border: #2e2e2e;
+      --text: #f0f0f0;
+      --muted: #777;
+      --accent: #e8ff47;
+      --green: #4ade80;
+      --red: #f87171;
+      --orange: #fb923c;
+      --purple: #c084fc;
+      --radius: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    nav { display:flex; justify-content:space-between; align-items:center; padding:1.1rem 2rem; background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100 }
+    .logo { font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:800; color:var(--accent); text-decoration:none }
+    .nav-links { display:flex; gap:1.8rem; list-style:none }
+    .nav-links a { text-decoration:none; color:var(--muted); font-size:.88rem; font-weight:500; transition:color .2s }
+    .nav-links a:hover,.nav-links a.active { color:var(--text) }
+    .nav-right { display:flex; gap:.7rem; align-items:center }
+    .btn { padding:.5rem 1.1rem; border-radius:8px; font-family:'Inter',sans-serif; font-size:.85rem; font-weight:600; cursor:pointer; border:none; transition:all .2s }
+    .btn-ghost { background:transparent; border:1px solid var(--border); color:var(--text) }
+    .btn-accent { background:var(--accent); color:#111 }
+    .nav-avatar { width:32px; height:32px; border-radius:50%; background:var(--accent); color:#111; display:grid; place-items:center; font-weight:700; font-size:.8rem; flex-shrink:0; cursor:pointer }
+    .profile-dropdown { position:relative }
+    .dropdown-menu { display:none; position:absolute; top:44px; right:0; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); min-width:200px; box-shadow:0 12px 40px rgba(0,0,0,.5); z-index:200; overflow:hidden }
+    .profile-dropdown.open .dropdown-menu { display:block }
+    .dropdown-header { padding:.9rem 1rem .5rem; font-weight:700; font-size:.82rem; color:var(--accent); border-bottom:1px solid var(--border) }
+    .dropdown-item { display:block; padding:.6rem 1rem; font-size:.82rem; color:var(--text); text-decoration:none; transition:background .15s }
+    .dropdown-item:hover { background:var(--surface2) }
+    .dropdown-danger { color:var(--red) }
+    .dropdown-divider { border-top:1px solid var(--border); margin:.3rem 0 }
+    .hamburger { display:none; background:none; border:none; color:var(--text); font-size:1.4rem; cursor:pointer }
+    .login-overlay { display:none }
+    .form-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem }
+    .form-group { margin-bottom:.9rem }
+    .form-group label { display:block; font-size:.72rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:.35rem }
+
+    .page-header { max-width:1100px; margin:0 auto; padding:2.5rem 2rem 0 }
+    .page-header h1 { font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:800; margin-bottom:.3rem }
+    .page-header p { font-size:.82rem; color:var(--muted); margin-bottom:2rem }
+
+    .content { max-width:1100px; margin:0 auto; padding:0 2rem 3rem }
+    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem }
+
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; margin-bottom:1rem }
+    .card-title { font-family:'Syne',sans-serif; font-size:1rem; font-weight:800; color:var(--accent); margin-bottom:.3rem }
+    .card-sub { font-size:.72rem; color:var(--muted); margin-bottom:1rem; font-style:italic }
+
+    table { width:100%; border-collapse:collapse; font-size:.82rem }
+    th { text-align:left; font-size:.68rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; padding:.5rem .6rem; border-bottom:1px solid var(--border) }
+    td { padding:.5rem .6rem; border-bottom:1px solid var(--border) }
+    tr:last-child td { border-bottom:none }
+    tr:hover td { background:var(--surface2) }
+
+    .rank { color:var(--accent); font-weight:700; font-size:.75rem }
+    .val { font-weight:700 }
+    .val-accent { color:var(--accent); font-weight:700 }
+    .val-green { color:var(--green); font-weight:700 }
+    .muted { color:var(--muted) }
+    .empty-msg { text-align:center; padding:1.5rem; color:var(--muted); font-size:.82rem }
+
+    footer { text-align:center; padding:2rem; font-size:.75rem; color:var(--muted); border-top:1px solid var(--border); margin-top:2rem }
+
+    @media (max-width: 768px) {
+      .grid-2 { grid-template-columns:1fr }
+      .nav-links { display:none }
+      .hamburger { display:block }
+    }
+  </style>
+</head>
+<body>
+
+{% set active_page = 'analyse' %}
+{% include 'navbar.html' %}
+
+<div class="page-header">
+  <h1>Analyse Avancée</h1>
+  <p>Requêtes complexes : jointures multiples, sous-requêtes, agrégations — données en temps réel depuis MySQL.</p>
+</div>
+
+<div class="content">
+
+  <div class="grid-2">
+    <!-- Classement Volume -->
+    <div class="card">
+      <div class="card-title">🏆 Classement par Volume</div>
+      <div class="card-sub">SUM(poids × reps) — Jointure 3 tables + GROUP BY</div>
+      <table>
+        <tr><th>#</th><th>Utilisateur</th><th>Volume (kg)</th></tr>
+        {% for u in classement_volume %}
+        <tr>
+          <td class="rank">{{ loop.index }}</td>
+          <td>{{ u.pseudo }}</td>
+          <td class="val-accent">{{ '{:,.0f}'.format(u.volume_total_kg) }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3" class="empty-msg">Aucune donnée</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+
+    <!-- Top Exercices -->
+    <div class="card">
+      <div class="card-title">💪 Top Charges Soulevées</div>
+      <div class="card-sub">MAX(poids) — Jointure 4 tables + filtre warmup</div>
+      <table>
+        <tr><th>#</th><th>Athlète</th><th>Exercice</th><th>Max (kg)</th></tr>
+        {% for e in top_exercices %}
+        <tr>
+          <td class="rank">{{ loop.index }}</td>
+          <td>{{ e.pseudo }}</td>
+          <td>{{ e.exercice }}</td>
+          <td class="val-accent">{{ e.poids_max_kg }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="empty-msg">Aucune donnée</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- Muscles Populaires -->
+    <div class="card">
+      <div class="card-title">🎯 Muscles les Plus Travaillés</div>
+      <div class="card-sub">COUNT(series) — Jointure 3 tables via cibler</div>
+      <table>
+        <tr><th>#</th><th>Muscle</th><th>Catégorie</th><th>Séries</th></tr>
+        {% for m in muscles_populaires %}
+        <tr>
+          <td class="rank">{{ loop.index }}</td>
+          <td>{{ m.nom_muscle }}</td>
+          <td class="muted">{{ m.categorie }}</td>
+          <td class="val-green">{{ m.nb_series }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="empty-msg">Aucune donnée</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+
+    <!-- Séances par Programme -->
+    <div class="card">
+      <div class="card-title">📊 Séances par Programme</div>
+      <div class="card-sub">Sous-requête corrélée dans le SELECT</div>
+      <table>
+        <tr><th>Programme</th><th>Séances</th></tr>
+        {% for p in seances_par_prog %}
+        {% if p.nb_seances > 0 %}
+        <tr>
+          <td>{{ p.nom_programme }}</td>
+          <td class="val-accent">{{ p.nb_seances }}</td>
+        </tr>
+        {% endif %}
+        {% else %}
+        <tr><td colspan="2" class="empty-msg">Aucune donnée</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- Records Personnels -->
+    <div class="card">
+      <div class="card-title">🥇 Records Personnels Récents</div>
+      <div class="card-sub">Jointure 3 tables + ORDER BY date DESC</div>
+      <table>
+        <tr><th>Athlète</th><th>Exercice</th><th>Record</th><th>Date</th></tr>
+        {% for r in records_recents %}
+        <tr>
+          <td>{{ r.pseudo }}</td>
+          <td>{{ r.exercice }}</td>
+          <td class="val-accent">{{ r.record_kg }} kg</td>
+          <td class="muted">{{ r.date_record | datefr }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="empty-msg">Aucun record</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+
+    <!-- Utilisateurs Inactifs -->
+    <div class="card">
+      <div class="card-title">👻 Utilisateurs Sans Séance</div>
+      <div class="card-sub">Sous-requête NOT IN (SELECT DISTINCT ...)</div>
+      <table>
+        <tr><th>Pseudo</th><th>Email</th></tr>
+        {% for u in users_inactifs %}
+        <tr>
+          <td>{{ u.pseudo }}</td>
+          <td class="muted">{{ u.email }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="2" class="empty-msg">Tous les utilisateurs ont au moins une séance</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  IronTrack — Projet GLO-2005 · Hachim · Melvin · Abdelali · Fabrice
+</footer>
+
+<script>
+  document.addEventListener('click', e => {
+    document.querySelectorAll('.profile-dropdown.open').forEach(d => {
+      if (!d.contains(e.target)) d.classList.remove('open');
+    });
+  });
+</script>
+
+</body>
+</html>

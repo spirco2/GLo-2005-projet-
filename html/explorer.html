@@ -228,7 +228,7 @@
 
     rows.forEach(row => {
       const nom = row.dataset.nom || '';
-      // Split strict sur || → tableau de muscles exacts
+      // Split strict sur || → tableau de muscles exacts...
       const musclesArray = (row.dataset.muscles || '').split('||').filter(Boolean);
 
       const matchQ = !q || nom.includes(q);

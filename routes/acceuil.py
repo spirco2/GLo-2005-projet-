@@ -1,65 +1,19 @@
 """
 IronTrack — routes/acceuil.py
-Page d'accueil : héro, calculateur IMC, muscles, exercices, programmes, inscription.
+Page d'accueil épurée : Hero + IMC + Connexion/Inscription.
+Sécurité : werkzeug.security (PBKDF2 + salt) au lieu de hashlib.
 """
 
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from werkzeug.security import generate_password_hash, check_password_hash
 from db import get_db
-import hashlib
 
 bp = Blueprint('acceuil', __name__)
 
 
 @bp.route('/')
 def index():
-    conn = get_db()
-    cursor = conn.cursor(dictionary=True)
-    try:
-        # Muscles groupés par catégorie
-        cursor.execute("""
-            SELECT m.categorie, m.nom_muscle,
-                   COUNT(c.id_ex) AS nb_exercices
-            FROM Muscles m
-            LEFT JOIN cibler c ON m.id_muscle = c.id_muscle
-            GROUP BY m.id_muscle
-            ORDER BY m.categorie, m.nom_muscle
-        """)
-        muscles_raw = cursor.fetchall()
-
-        # Regrouper par catégorie
-        categories = {}
-        for row in muscles_raw:
-            cat = row['categorie']
-            if cat not in categories:
-                categories[cat] = {'noms': [], 'nb_total': 0}
-            categories[cat]['noms'].append(row['nom_muscle'])
-            categories[cat]['nb_total'] += row['nb_exercices']
-
-        # Exercices (échantillon pour la page d'accueil)
-        cursor.execute("""
-            SELECT e.id_ex, e.nom, e.description, e.equipement, e.difficulte,
-                   GROUP_CONCAT(m.categorie SEPARATOR ' · ') AS muscles
-            FROM exercice e
-            LEFT JOIN cibler c ON e.id_ex = c.id_ex
-            LEFT JOIN Muscles m ON c.id_muscle = m.id_muscle
-            GROUP BY e.id_ex
-            ORDER BY RAND()
-            LIMIT 8
-        """)
-        exercices = cursor.fetchall()
-
-        # Programmes
-        cursor.execute("SELECT * FROM programme ORDER BY id_programme LIMIT 6")
-        programmes = cursor.fetchall()
-
-        return render_template('index.html',
-                               categories=categories,
-                               exercices=exercices,
-                               programmes=programmes,
-                               user=session.get('user_id'))
-    finally:
-        cursor.close()
-        conn.close()
+    return render_template('index.html')
 
 
 @bp.route('/inscription', methods=['POST'])
@@ -76,7 +30,12 @@ def inscription():
         flash('Tous les champs sont obligatoires.', 'error')
         return redirect(url_for('acceuil.index') + '#inscription')
 
-    mdp_hash = hashlib.sha256(mdp.encode()).hexdigest()[:16]
+    if len(mdp) < 8:
+        flash('Le mot de passe doit contenir au moins 8 caractères.', 'error')
+        return redirect(url_for('acceuil.index') + '#inscription')
+
+    # Hash sécurisé avec PBKDF2 + salt aléatoire
+    mdp_hash = generate_password_hash(mdp)
 
     conn = get_db()
     cursor = conn.cursor()
@@ -87,14 +46,12 @@ def inscription():
         """, (pseudo, email, mdp_hash, date_naissance, taille, poids, sexe))
 
         user_id = cursor.lastrowid
-        conn.commit()
 
-        # Initialiser les statistiques d'assiduité
+        # Initialiser statistiques d'assiduité
         cursor.execute("""
             INSERT INTO statistiques_utilisateurs (id_user, semaines_consecutives)
             VALUES (%s, 0)
         """, (user_id,))
-        conn.commit()
 
         # Calculer l'IMC via la procédure stockée
         cursor.callproc('imc_de_utilisateur', (user_id,))
@@ -110,7 +67,7 @@ def inscription():
         if 'Duplicate' in str(e):
             flash('Ce pseudo ou cet email est déjà utilisé.', 'error')
         else:
-            flash(f'Erreur lors de l\'inscription.', 'error')
+            flash('Erreur lors de l\'inscription.', 'error')
         return redirect(url_for('acceuil.index') + '#inscription')
     finally:
         cursor.close()
@@ -121,18 +78,19 @@ def inscription():
 def connexion():
     email = request.form.get('email', '').strip()
     mdp = request.form.get('mdp', '')
-    mdp_hash = hashlib.sha256(mdp.encode()).hexdigest()[:16]
 
     conn = get_db()
     cursor = conn.cursor(dictionary=True)
     try:
+        # Récupérer le hash stocké pour cet email
         cursor.execute("""
-            SELECT id, pseudo FROM Utilisateurs
-            WHERE email = %s AND mdp_hash = %s
-        """, (email, mdp_hash))
+            SELECT id, pseudo, mdp_hash FROM Utilisateurs
+            WHERE email = %s
+        """, (email,))
         user = cursor.fetchone()
 
-        if user:
+        # Vérification sécurisée avec check_password_hash
+        if user and check_password_hash(user['mdp_hash'], mdp):
             session['user_id'] = user['id']
             session['pseudo'] = user['pseudo']
             flash('Connexion réussie !', 'success')

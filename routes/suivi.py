@@ -1,17 +1,17 @@
 """
 IronTrack — routes/suivi.py
-Page de statistiques et suivi.
+Page de statistiques — bugs date et durée corrigés.
+Route renommée /statistiques.
 """
 
 from flask import Blueprint, render_template, session, redirect, url_for, flash
 from db import get_db
-from datetime import datetime, timedelta
-import calendar
+from datetime import datetime
 
 bp = Blueprint('suivi', __name__)
 
 
-@bp.route('/stats')
+@bp.route('/statistiques')
 def statistiques():
     if not session.get('user_id'):
         flash('Connectez-vous pour voir vos statistiques.', 'error')
@@ -30,9 +30,9 @@ def statistiques():
 
         # ── Totaux ─────────────────────────────────────────
         cursor.execute("""
-            SELECT COUNT(*)              AS nb_seances,
-                   COALESCE(SUM(volume_total), 0) AS volume_total,
-                   COALESCE(SUM(TIME_TO_SEC(duree)), 0) AS temps_total_sec
+            SELECT COUNT(*)                              AS nb_seances,
+                   COALESCE(SUM(volume_total), 0)        AS volume_total,
+                   COALESCE(SUM(TIME_TO_SEC(duree)), 0)  AS temps_total_sec
             FROM seance
             WHERE id_user = %s
         """, (user_id,))
@@ -47,11 +47,11 @@ def statistiques():
         streak_row = cursor.fetchone()
         streak = streak_row['semaines_consecutives'] if streak_row else 0
 
-        # ── Données hebdomadaires (12 dernières semaines) ──
+        # ── Données hebdomadaires (12 semaines) ────────────
         cursor.execute("""
-            SELECT YEARWEEK(date_debut, 1)        AS yw,
-                   MIN(DATE(date_debut))           AS label_date,
-                   SUM(TIME_TO_SEC(duree)) / 60    AS minutes
+            SELECT YEARWEEK(date_debut, 1)           AS yw,
+                   MIN(date_debut)                   AS label_date,
+                   SUM(TIME_TO_SEC(duree)) / 60      AS minutes
             FROM seance
             WHERE id_user = %s
               AND date_debut >= DATE_SUB(NOW(), INTERVAL 12 WEEK)
@@ -64,20 +64,19 @@ def statistiques():
         weekly_data = []
         for w in weekly_raw:
             pct = int((w['minutes'] / max_min) * 100)
-            label = w['label_date'].strftime('%d %b') if w['label_date'] else ''
             weekly_data.append({
-                'label': label,
-                'minutes': int(w['minutes']),
-                'pct': pct
+                'label_date': w['label_date'],   # datetime brut → filtré en Jinja2
+                'minutes':    int(w['minutes']),
+                'pct':        pct
             })
 
         # ── Séances récentes ───────────────────────────────
         cursor.execute("""
             SELECT s.id_seance,
-                   p.nom_programme AS name,
-                   DATE_FORMAT(s.date_debut, '%%d %%b') AS date,
+                   p.nom_programme         AS name,
+                   s.date_debut,
                    COUNT(DISTINCT sl.id_ex) AS nb_exercises,
-                   CONCAT(MINUTE(s.duree) + HOUR(s.duree)*60, ' min') AS duration
+                   TIME_TO_SEC(s.duree)     AS duree_sec
             FROM seance s
             JOIN programme p ON s.id_programme = p.id_programme
             LEFT JOIN serie_log sl ON s.id_seance = sl.id_seance
@@ -100,9 +99,9 @@ def statistiques():
         jours_seance = [r['jour'] for r in cursor.fetchall()]
 
         stats = {
-            'volume_total':   int(totaux['volume_total']),
-            'nb_seances':     totaux['nb_seances'],
-            'temps_total_min': int(totaux['temps_total_sec'] / 60),
+            'volume_total':    int(totaux['volume_total']),
+            'nb_seances':      totaux['nb_seances'],
+            'temps_total_sec': int(totaux['temps_total_sec']),
             'streak_semaines': streak,
             'weekly_data':     weekly_data,
             'recent_workouts': recent_workouts,

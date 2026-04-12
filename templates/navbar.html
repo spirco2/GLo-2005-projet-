@@ -1,0 +1,55 @@
+<!-- NAV — partial partagé -->
+<nav>
+  <a href="/" class="logo">IronTrack</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="/" class="{{ 'active' if active_page == 'accueil' else '' }}">Accueil</a></li>
+    <li><a href="/explorer" class="{{ 'active' if active_page == 'explorer' else '' }}">Explorer</a></li>
+    {% if session.get('user_id') %}
+      <li><a href="/programmes" class="{{ 'active' if active_page == 'programmes' else '' }}">Mes Programmes</a></li>
+      <li><a href="/statistiques" class="{{ 'active' if active_page == 'statistiques' else '' }}">Statistiques</a></li>
+      <li><a href="/analyse" class="{{ 'active' if active_page == 'analyse' else '' }}">Analyse</a></li>
+    {% endif %}
+  </ul>
+  <div class="nav-right">
+    {% if session.get('user_id') %}
+      <div class="profile-dropdown">
+        <div class="nav-avatar" onclick="document.querySelector('.profile-dropdown').classList.toggle('open')">
+          {{ session.get('pseudo', '??')[:2]|upper }}
+        </div>
+        <div class="dropdown-menu">
+          <div class="dropdown-header">{{ session.get('pseudo', '') }}</div>
+          <a href="/securite" class="dropdown-item">👤 Mon Profil</a>
+          <a href="/securite#password" class="dropdown-item">🔒 Sécurité</a>
+          <div class="dropdown-divider"></div>
+          <a href="/deconnexion" class="dropdown-item dropdown-danger">↪ Déconnexion</a>
+        </div>
+      </div>
+    {% else %}
+      <button class="btn btn-ghost" onclick="document.getElementById('login-overlay').classList.add('open')">Connexion</button>
+      <a href="/#inscription" class="btn btn-accent" style="text-decoration:none">S'inscrire</a>
+    {% endif %}
+    <button class="hamburger" id="hamburger" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<!-- MODAL CONNEXION (global) -->
+{% if not session.get('user_id') %}
+<div class="login-overlay" id="login-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="form-box" style="max-width:400px;position:relative">
+    <button onclick="document.getElementById('login-overlay').classList.remove('open')" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer">✕</button>
+    <h2>Connexion</h2>
+    <p style="font-size:.8rem;color:var(--muted);margin-bottom:1.5rem">Entrez vos identifiants pour accéder à votre compte.</p>
+    <form method="POST" action="/connexion">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" placeholder="ex: john@email.com" required style="width:100%;padding:.62rem .9rem;border:1px solid var(--border);border-radius:8px;font-size:.88rem;background:var(--surface2);color:var(--text);outline:none"/>
+      </div>
+      <div class="form-group" style="margin-top:.9rem">
+        <label>Mot de passe</label>
+        <input type="password" name="mdp" placeholder="••••••••" required style="width:100%;padding:.62rem .9rem;border:1px solid var(--border);border-radius:8px;font-size:.88rem;background:var(--surface2);color:var(--text);outline:none"/>
+      </div>
+      <button type="submit" class="btn btn-accent" style="width:100%;padding:.78rem;font-size:.92rem;margin-top:1rem;border-radius:8px">Se connecter</button>
+    </form>
+  </div>
+</div>
+{% endif %}

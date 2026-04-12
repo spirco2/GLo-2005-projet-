@@ -20,309 +20,94 @@
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
+    nav { display:flex; justify-content:space-between; align-items:center; padding:1.1rem 2rem; background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100 }
+    .logo { font-family:'Syne',sans-serif; font-size:1.3rem; font-weight:800; color:var(--accent); text-decoration:none }
+    .nav-links { display:flex; gap:1.8rem; list-style:none }
+    .nav-links a { text-decoration:none; color:var(--muted); font-size:.88rem; font-weight:500; transition:color .2s }
+    .nav-links a:hover,.nav-links a.active { color:var(--text) }
+    .nav-right { display:flex; gap:.7rem; align-items:center }
+    .btn { padding:.5rem 1.1rem; border-radius:8px; font-family:'Inter',sans-serif; font-size:.85rem; font-weight:600; cursor:pointer; border:none; transition:all .2s }
+    .btn-ghost { background:transparent; border:1px solid var(--border); color:var(--text) }
+    .btn-ghost:hover { border-color:var(--text) }
+    .btn-accent { background:var(--accent); color:#111 }
+    .btn-accent:hover { background:#d4eb30 }
+    .nav-avatar { width:32px; height:32px; border-radius:50%; background:var(--accent); color:#111; display:grid; place-items:center; font-weight:700; font-size:.8rem; flex-shrink:0; cursor:pointer }
 
-    /* ── NAV ── */
-    nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.1rem 2rem;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
+    .profile-dropdown { position:relative }
+    .dropdown-menu { display:none; position:absolute; top:44px; right:0; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); min-width:200px; box-shadow:0 12px 40px rgba(0,0,0,.5); z-index:200; overflow:hidden }
+    .profile-dropdown.open .dropdown-menu { display:block }
+    .dropdown-header { padding:.9rem 1rem .5rem; font-weight:700; font-size:.82rem; color:var(--accent); border-bottom:1px solid var(--border) }
+    .dropdown-item { display:block; padding:.6rem 1rem; font-size:.82rem; color:var(--text); text-decoration:none; transition:background .15s }
+    .dropdown-item:hover { background:var(--surface2) }
+    .dropdown-danger { color:var(--red) }
+    .dropdown-danger:hover { background:rgba(248,113,113,.08) }
+    .dropdown-divider { border-top:1px solid var(--border); margin:.3rem 0 }
 
-    .logo {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.3rem;
-      font-weight: 800;
-      color: var(--accent);
-      text-decoration: none;
-    }
+    .login-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:200; align-items:center; justify-content:center }
+    .login-overlay.open { display:flex }
+    .form-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem }
 
-    .nav-links { display: flex; gap: 1.8rem; list-style: none; }
-    .nav-links a {
-      text-decoration: none;
-      color: var(--muted);
-      font-size: .88rem;
-      font-weight: 500;
-      transition: color .2s;
-    }
-    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .hamburger { display:none; background:none; border:none; color:var(--text); font-size:1.4rem; cursor:pointer }
 
-    .nav-right { display: flex; gap: .7rem; align-items: center; }
+    .page-header { max-width:700px; margin:0 auto; padding:2.5rem 2rem 0 }
+    .page-header h1 { font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:800; margin-bottom:.3rem }
+    .page-header p { font-size:.82rem; color:var(--muted); margin-bottom:2rem }
 
-    .btn {
-      padding: .5rem 1.1rem;
-      border-radius: 8px;
-      font-family: 'Inter', sans-serif;
-      font-size: .85rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      transition: all .2s;
-    }
-    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
-    .btn-ghost:hover { border-color: var(--text); }
-    .btn-accent { background: var(--accent); color: #111; }
-    .btn-accent:hover { background: #d4eb30; }
+    .tab-nav { display:flex; gap:0; border-bottom:1px solid var(--border); margin-bottom:2rem; max-width:700px; margin-left:auto; margin-right:auto; padding:0 2rem }
+    .tab-nav a { text-decoration:none; font-size:.85rem; font-weight:600; color:var(--muted); padding:.7rem 1.2rem; border-bottom:2px solid transparent; transition:all .2s; margin-bottom:-1px }
+    .tab-nav a:hover { color:var(--text) }
+    .tab-nav a.active { color:var(--accent); border-bottom-color:var(--accent) }
 
-    .nav-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #111;
-      display: grid;
-      place-items: center;
-      font-weight: 700;
-      font-size: .8rem;
-      flex-shrink: 0;
-    }
+    .settings-section { max-width:700px; margin:0 auto; padding:0 2rem 3rem }
+    .settings-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.8rem; margin-bottom:1rem }
+    .settings-card-header { display:flex; align-items:center; gap:.7rem; margin-bottom:1.4rem }
+    .settings-card-icon { width:36px; height:36px; border-radius:8px; display:grid; place-items:center; font-size:1rem; flex-shrink:0 }
+    .settings-card-icon.profile { background:rgba(232,255,71,.1) }
+    .settings-card-icon.lock { background:rgba(74,222,128,.1) }
+    .settings-card-title { font-weight:700; font-size:.95rem }
+    .settings-card-sub { font-size:.75rem; color:var(--muted); margin-top:.1rem }
 
-    /* ── PAGE LAYOUT ── */
-    .page-header {
-      max-width: 700px;
-      margin: 0 auto;
-      padding: 2.5rem 2rem 0;
-    }
+    .form-group { margin-bottom:.9rem }
+    .form-group label { display:block; font-size:.72rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:.35rem }
+    .form-group input,.form-group select { width:100%; padding:.62rem .9rem; border:1px solid var(--border); border-radius:8px; font-family:'Inter',sans-serif; font-size:.88rem; background:var(--surface2); color:var(--text); outline:none; transition:border-color .2s }
+    .form-group input:focus,.form-group select:focus { border-color:var(--accent) }
+    .form-group select option { background:var(--surface2) }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:.8rem }
 
-    .page-header h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.6rem;
-      font-weight: 800;
-      margin-bottom: .3rem;
-    }
+    .card-divider { border:none; border-top:1px solid var(--border); margin:1.4rem 0 }
+    .btn-submit { width:100%; padding:.78rem; font-size:.92rem; margin-top:.6rem; border-radius:8px }
+    .btn-danger-link { display:block; text-align:center; font-size:.82rem; font-weight:600; color:var(--red); cursor:pointer; background:none; border:none; padding:.8rem; transition:opacity .2s; font-family:'Inter',sans-serif }
+    .btn-danger-link:hover { opacity:.7 }
 
-    .page-header p {
-      font-size: .82rem;
-      color: var(--muted);
-      margin-bottom: 2rem;
-    }
+    .flash { max-width:700px; margin:1rem auto; padding:.7rem 1.2rem; border-radius:8px; font-size:.82rem; font-weight:500 }
+    .flash-success { background:rgba(74,222,128,.1); color:var(--green); border:1px solid rgba(74,222,128,.2) }
+    .flash-error { background:rgba(248,113,113,.1); color:var(--red); border:1px solid rgba(248,113,113,.2) }
 
-    /* ── TAB NAV ── */
-    .tab-nav {
-      display: flex;
-      gap: 0;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 2rem;
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
-      padding: 0 2rem;
-    }
-
-    .tab-nav a {
-      text-decoration: none;
-      font-size: .85rem;
-      font-weight: 600;
-      color: var(--muted);
-      padding: .7rem 1.2rem;
-      border-bottom: 2px solid transparent;
-      transition: all .2s;
-      margin-bottom: -1px;
-    }
-
-    .tab-nav a:hover { color: var(--text); }
-    .tab-nav a.active { color: var(--accent); border-bottom-color: var(--accent); }
-
-    /* ── SETTINGS ── */
-    .settings-section {
-      max-width: 700px;
-      margin: 0 auto;
-      padding: 0 2rem 3rem;
-    }
-
-    .settings-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.8rem;
-      margin-bottom: 1rem;
-    }
-
-    .settings-card-header {
-      display: flex;
-      align-items: center;
-      gap: .7rem;
-      margin-bottom: 1.4rem;
-    }
-
-    .settings-card-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      display: grid;
-      place-items: center;
-      font-size: 1rem;
-      flex-shrink: 0;
-    }
-
-    .settings-card-icon.profile { background: rgba(232,255,71,.1); }
-    .settings-card-icon.lock    { background: rgba(74,222,128,.1); }
-
-    .settings-card-title { font-weight: 700; font-size: .95rem; }
-    .settings-card-sub { font-size: .75rem; color: var(--muted); margin-top: .1rem; }
-
-    /* ── FORM ── */
-    .form-group { margin-bottom: .9rem; }
-
-    .form-group label {
-      display: block;
-      font-size: .72rem;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .5px;
-      margin-bottom: .35rem;
-    }
-
-    .form-group input,
-    .form-group select {
-      width: 100%;
-      padding: .62rem .9rem;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-family: 'Inter', sans-serif;
-      font-size: .88rem;
-      background: var(--surface2);
-      color: var(--text);
-      outline: none;
-      transition: border-color .2s;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus { border-color: var(--accent); }
-    .form-group select option { background: var(--surface2); }
-
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
-
-    /* ── TOGGLE ── */
-    .toggle-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: .6rem 0;
-    }
-
-    .toggle-row-text { font-size: .85rem; font-weight: 500; }
-    .toggle-row-sub { font-size: .72rem; color: var(--muted); margin-top: .15rem; max-width: 400px; }
-
-    .toggle-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
-    .toggle-switch input { opacity: 0; width: 0; height: 0; }
-
-    .toggle-track {
-      position: absolute;
-      inset: 0;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 99px;
-      cursor: pointer;
-      transition: all .2s;
-    }
-
-    .toggle-track::after {
-      content: '';
-      position: absolute;
-      top: 2px; left: 2px;
-      width: 18px; height: 18px;
-      border-radius: 50%;
-      background: var(--muted);
-      transition: all .2s;
-    }
-
-    .toggle-switch input:checked + .toggle-track { background: var(--accent); border-color: var(--accent); }
-    .toggle-switch input:checked + .toggle-track::after { background: #111; transform: translateX(20px); }
-
-    .card-divider { border: none; border-top: 1px solid var(--border); margin: 1.4rem 0; }
-
-    /* ── BUTTONS ── */
-    .btn-submit { width: 100%; padding: .78rem; font-size: .92rem; margin-top: .6rem; border-radius: 8px; }
-
-    .btn-danger-link {
-      display: block;
-      text-align: center;
-      font-size: .82rem;
-      font-weight: 600;
-      color: var(--red);
-      cursor: pointer;
-      background: none;
-      border: none;
-      padding: .8rem;
-      transition: opacity .2s;
-      font-family: 'Inter', sans-serif;
-    }
-    .btn-danger-link:hover { opacity: .7; }
-
-    /* ── FLASH MESSAGE ── */
-    .flash {
-      max-width: 700px;
-      margin: 0 auto 1rem;
-      padding: .7rem 1.2rem;
-      border-radius: 8px;
-      font-size: .82rem;
-      font-weight: 500;
-      display: none;
-    }
-    .flash.success { display: block; background: rgba(74,222,128,.1); color: var(--green); border: 1px solid rgba(74,222,128,.2); }
-    .flash.error   { display: block; background: rgba(248,113,113,.1); color: var(--red); border: 1px solid rgba(248,113,113,.2); }
-
-    footer {
-      text-align: center;
-      padding: 2rem;
-      font-size: .75rem;
-      color: var(--muted);
-      border-top: 1px solid var(--border);
-      margin-top: 2rem;
-    }
-
-    .hamburger { display: none; background: none; border: none; color: var(--text); font-size: 1.4rem; cursor: pointer; }
+    footer { text-align:center; padding:2rem; font-size:.75rem; color:var(--muted); border-top:1px solid var(--border); margin-top:2rem }
 
     @media (max-width: 768px) {
-      .nav-links {
-        position: fixed; top: 60px; left: 0; right: 0;
-        background: var(--surface); border-bottom: 1px solid var(--border);
-        flex-direction: column; padding: 1rem 2rem; gap: .6rem;
-        transform: translateY(-120%); transition: transform .3s ease;
-      }
-      .nav-links.open { transform: translateY(0); }
-      .hamburger { display: block; }
-      .form-row { grid-template-columns: 1fr; }
-      .page-header, .tab-nav, .settings-section { padding-left: 1.2rem; padding-right: 1.2rem; }
-      .settings-card { padding: 1.3rem; }
-      .page-header h1 { font-size: 1.3rem; }
+      .nav-links { position:fixed; top:60px; left:0; right:0; background:var(--surface); border-bottom:1px solid var(--border); flex-direction:column; padding:1rem 2rem; gap:.6rem; transform:translateY(-120%); transition:transform .3s ease }
+      .nav-links.open { transform:translateY(0) }
+      .hamburger { display:block }
+      .form-row { grid-template-columns:1fr }
+      .page-header,.tab-nav,.settings-section { padding-left:1.2rem; padding-right:1.2rem }
+      .settings-card { padding:1.3rem }
+      .page-header h1 { font-size:1.3rem }
     }
   </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav>
-  <a href="/" class="logo">IronTrack</a>
-  <ul class="nav-links" id="navLinks">
-    <li><a href="/">Accueil</a></li>
-    <li><a href="/securite" class="active">Sécurité</a></li>
-    <li><a href="/stats">Statistiques</a></li>
-  </ul>
-  <div class="nav-right">
-    <!-- Flask: initiale du user → {{ user.username[0]|upper }} -->
-    <div class="nav-avatar" id="nav-avatar"></div>
-    <button class="hamburger" id="hamburger" aria-label="Menu">☰</button>
-  </div>
-</nav>
+{% set active_page = 'securite' %}
+{% include 'navbar.html' %}
 
-<!-- FLASH MESSAGES — Flask: {% with messages = get_flashed_messages(with_categories=true) %} -->
-<!-- <div class="flash success">Modifications enregistrées avec succès.</div> -->
-<!-- <div class="flash error">Erreur lors de la mise à jour.</div> -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    <div class="flash flash-{{ category }}">{{ message }}</div>
+  {% endfor %}
+{% endwith %}
 
 <div class="page-header">
   <h1>Mon compte</h1>
@@ -335,37 +120,6 @@
 </div>
 
 <div class="settings-section">
-
-  <!--
-    ══════════════════════════════════════════════
-    FLASK INTEGRATION GUIDE
-    ══════════════════════════════════════════════
-    Ce formulaire est prévu pour un POST vers Flask.
-
-    Route suggérée :
-      @app.route('/securite', methods=['GET', 'POST'])
-      def securite():
-          user = get_current_user()  # depuis la session
-          if request.method == 'POST':
-              action = request.form.get('action')
-              if action == 'update_profile':
-                  # request.form: username, fullname, sex, birthdate, private_profile
-                  ...
-              elif action == 'update_password':
-                  # request.form: current_password, new_password, confirm_password
-                  ...
-              elif action == 'delete_account':
-                  ...
-          return render_template('securite.templates', user=user)
-
-    Template Jinja2 :
-      value="{{ user.username }}"
-      value="{{ user.nom }}"
-      value="{{ user.date_naissance }}"
-      {{ 'selected' if user.sexe == 'homme' }}
-      {{ 'checked' if user.profil_prive }}
-    ══════════════════════════════════════════════
-  -->
 
   <!-- ─── Profil Card ─── -->
   <form method="POST" action="/securite">
@@ -383,46 +137,39 @@
       <div class="form-row">
         <div class="form-group">
           <label for="username">Nom d'utilisateur</label>
-          <!-- Flask: value="{{ user.username }}" -->
-          <input type="text" id="username" name="username" placeholder="ex: john_doe" value="" maxlength="50" required/>
+          <input type="text" id="username" name="username" placeholder="ex: john_doe" value="{{ user.pseudo if user else '' }}" maxlength="50" required/>
         </div>
         <div class="form-group">
-          <label for="fullname">Nom complet</label>
-          <!-- Flask: value="{{ user.nom }}" -->
-          <input type="text" id="fullname" name="fullname" placeholder="ex: John Doe" value="" maxlength="100"/>
+          <label for="sex">Sexe</label>
+          <select id="sex" name="sex">
+            <option value="">-- Choisir --</option>
+            <option value="homme" {{ 'selected' if user and user.sexe == 'homme' }}>Homme</option>
+            <option value="femme" {{ 'selected' if user and user.sexe == 'femme' }}>Femme</option>
+            <option value="autre" {{ 'selected' if user and user.sexe == 'autre' }}>Autre / Non-binaire</option>
+          </select>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label for="sex">Sexe</label>
-          <!-- Flask: {{ 'selected' if user.sexe == 'homme' }} -->
-          <select id="sex" name="sex">
-            <option value="">-- Choisir --</option>
-            <option value="homme">Homme</option>
-            <option value="femme">Femme</option>
-            <option value="autre">Autre / Non-binaire</option>
-          </select>
+          <label for="birthdate">Date de naissance</label>
+          <input type="date" id="birthdate" name="birthdate" value="{{ user.date if user else '' }}"/>
         </div>
         <div class="form-group">
-          <label for="birthdate">Date de naissance</label>
-          <!-- Flask: value="{{ user.date_naissance }}" -->
-          <input type="date" id="birthdate" name="birthdate" value=""/>
+          <label>IMC actuel</label>
+          <input type="text" value="{{ '%.2f'|format(user.imc) if user and user.imc else 'Non calculé' }}" disabled style="opacity:.6"/>
         </div>
       </div>
 
-      <hr class="card-divider"/>
-
-      <div class="toggle-row">
-        <div>
-          <div class="toggle-row-text">Profil privé</div>
-          <div class="toggle-row-sub">Les autres utilisateurs devront demander à vous suivre. Seuls vos abonnés verront vos entraînements.</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="taille">Taille (cm)</label>
+          <input type="number" id="taille" name="taille" value="{{ user.taille if user else '' }}" min="50" max="250"/>
         </div>
-        <label class="toggle-switch">
-          <!-- Flask: {{ 'checked' if user.profil_prive }} -->
-          <input type="checkbox" id="private_profile" name="private_profile" value="1"/>
-          <span class="toggle-track"></span>
-        </label>
+        <div class="form-group">
+          <label for="poids">Poids (kg)</label>
+          <input type="number" id="poids" name="poids" value="{{ user.poids if user else '' }}" min="20" max="300" step="0.1"/>
+        </div>
       </div>
     </div>
 
@@ -477,12 +224,15 @@
 </footer>
 
 <script>
-  // Hamburger
-  document.getElementById('hamburger').addEventListener('click', () => {
-    document.getElementById('navLinks').classList.toggle('open');
+  const hb = document.getElementById('hamburger');
+  if (hb) hb.addEventListener('click', () => document.getElementById('navLinks').classList.toggle('open'));
+
+  document.addEventListener('click', e => {
+    document.querySelectorAll('.profile-dropdown.open').forEach(d => {
+      if (!d.contains(e.target)) d.classList.remove('open');
+    });
   });
 
-  // Delete confirmation
   function confirmDelete() {
     if (confirm('Êtes-vous sûr de vouloir supprimer votre compte ?\nCette action est irréversible.')) {
       document.getElementById('deleteForm').submit();

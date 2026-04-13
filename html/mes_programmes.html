@@ -17,6 +17,7 @@
       --muted:   #555;
       --muted2:  #888;
       --danger:  #ff4040;
+      --green:   #4ade80;
       --r:       10px;
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -24,19 +25,31 @@
 
     /* NAV */
     nav{display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:56px;background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
-    .logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--accent);letter-spacing:1px}
+    .logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--accent);letter-spacing:1px;text-decoration:none}
     .nav-links{display:flex;gap:1.75rem;list-style:none}
     .nav-links a{color:var(--muted2);text-decoration:none;font-size:0.875rem;font-weight:500;transition:color .2s}
     .nav-links a:hover{color:var(--text)}
     .nav-links a.active{color:var(--accent)}
-    .nav-right{display:flex;gap:.6rem}
-    .btn{font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;padding:.4rem .9rem;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text);transition:all .2s}
+    .nav-right{display:flex;gap:.6rem;align-items:center}
+    .btn{font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;padding:.4rem .9rem;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text);transition:all .2s;text-decoration:none}
     .btn:hover{border-color:var(--accent);color:var(--accent)}
     .btn.primary{background:var(--accent);color:#000;border-color:var(--accent)}
     .btn.primary:hover{background:var(--accent2)}
     .btn.danger:hover{border-color:var(--danger);color:var(--danger)}
     .btn.ghost{border:1px dashed var(--border);color:var(--muted2)}
     .btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+    /* DROPDOWN PROFIL */
+    .profile-dropdown{position:relative}
+    .nav-avatar{width:32px;height:32px;border-radius:50%;background:var(--accent);color:#000;display:grid;place-items:center;font-weight:800;font-size:.75rem;cursor:pointer;flex-shrink:0}
+    .dropdown-menu{display:none;position:absolute;top:42px;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);min-width:190px;box-shadow:0 12px 40px rgba(0,0,0,.6);z-index:200;overflow:hidden}
+    .profile-dropdown.open .dropdown-menu{display:block}
+    .dropdown-header{padding:.8rem 1rem .4rem;font-weight:700;font-size:.78rem;color:var(--accent);border-bottom:1px solid var(--border)}
+    .dropdown-item{display:block;padding:.55rem 1rem;font-size:.8rem;color:var(--text);text-decoration:none;transition:background .15s}
+    .dropdown-item:hover{background:var(--surface2)}
+    .dropdown-danger{color:var(--danger)}
+    .dropdown-danger:hover{background:rgba(255,64,64,.08)}
+    .dropdown-divider{border-top:1px solid var(--border);margin:.25rem 0}
 
     /* LAYOUT 3 COLONNES */
     .layout{display:grid;grid-template-columns:300px 1fr 360px;height:calc(100vh - 56px)}
@@ -157,17 +170,31 @@
 
 <!-- NAV -->
 <nav>
-  <span class="logo">IronTrack</span>
+  <a href="/" class="logo">IronTrack</a>
   <ul class="nav-links">
-    <li><a href="#">Calculer IMC</a></li>
-    <li><a href="#">Muscles</a></li>
-    <li><a href="#">Exercices</a></li>
-    <li><a href="#" class="active">Mes Programmes</a></li>
-    <li><a href="#">Suivi</a></li>
+    <li><a href="/">Accueil</a></li>
+    <li><a href="/explorer">Explorer</a></li>
+    <li><a href="/programmes" class="active">Mes Programmes</a></li>
+    <li><a href="/statistiques">Statistiques</a></li>
   </ul>
   <div class="nav-right">
-    <button class="btn">Connexion</button>
-    <button class="btn primary">S'inscrire</button>
+    {% if session.get('user_id') %}
+      <div class="profile-dropdown">
+        <div class="nav-avatar" onclick="this.parentElement.classList.toggle('open')">
+          {{ session.get('pseudo', '??')[:2]|upper }}
+        </div>
+        <div class="dropdown-menu">
+          <div class="dropdown-header">{{ session.get('pseudo', '') }}</div>
+          <a href="/securite" class="dropdown-item">👤 Mon Profil</a>
+          <a href="/securite#password" class="dropdown-item">🔒 Sécurité</a>
+          <div class="dropdown-divider"></div>
+          <a href="/deconnexion" class="dropdown-item dropdown-danger">↪ Déconnexion</a>
+        </div>
+      </div>
+    {% else %}
+      <a href="/" class="btn">Connexion</a>
+      <a href="/#inscription" class="btn primary">S'inscrire</a>
+    {% endif %}
   </div>
 </nav>
 
@@ -251,138 +278,38 @@
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-// DONNÉES — 100 exercices complets
+// DONNÉES — injectées par Flask via Jinja2
 // ═══════════════════════════════════════════════════════════════
-const EXERCICES = [
-  {id:1,  nom:"Extension mollets debout (Haltère)",    eq:"Haltère",      diff:"Intermédiaire", muscles:["Mollets"]},
-  {id:2,  nom:"Curl Biceps 21",                        eq:"Barre",        diff:"Avancé",        muscles:["Biceps"]},
-  {id:3,  nom:"Ciseaux abdominaux",                    eq:"Aucun",        diff:"Débutant",      muscles:["Abdominaux","Obliques"]},
-  {id:4,  nom:"Roue abdominale",                       eq:"Autres",       diff:"Avancé",        muscles:["Abdominaux"]},
-  {id:5,  nom:"Arnold Press",                          eq:"Haltère",      diff:"Intermédiaire", muscles:["Épaules","Triceps"]},
-  {id:6,  nom:"Squat pistolet assisté",                eq:"Aucun",        diff:"Avancé",        muscles:["Quadriceps","Fessiers"]},
-  {id:7,  nom:"Hyperextension 45°",                    eq:"Machine",      diff:"Débutant",      muscles:["Lombaires"]},
-  {id:8,  nom:"Good Morning (Barre)",                  eq:"Barre",        diff:"Intermédiaire", muscles:["Lombaires","Ischio-jambiers"]},
-  {id:9,  nom:"Curl derrière le dos (Câble)",          eq:"Machine",      diff:"Intermédiaire", muscles:["Biceps"]},
-  {id:10, nom:"Développé couché (Barre)",              eq:"Barre",        diff:"Débutant",      muscles:["Pectoraux","Triceps"]},
-  {id:11, nom:"Développé couché (Smith)",              eq:"Machine",      diff:"Débutant",      muscles:["Pectoraux","Triceps"]},
-  {id:12, nom:"Curl biceps (Barre)",                   eq:"Barre",        diff:"Débutant",      muscles:["Biceps"]},
-  {id:13, nom:"Curl biceps (Câble)",                   eq:"Machine",      diff:"Débutant",      muscles:["Biceps"]},
-  {id:14, nom:"Curl biceps (Haltères)",                eq:"Haltère",      diff:"Débutant",      muscles:["Biceps"]},
-  {id:15, nom:"Curl biceps (Machine)",                 eq:"Machine",      diff:"Débutant",      muscles:["Biceps"]},
-  {id:16, nom:"Squat fendu bulgare",                   eq:"Haltère",      diff:"Intermédiaire", muscles:["Quadriceps","Fessiers"]},
-  {id:17, nom:"Burpee classique",                      eq:"Aucun",        diff:"Avancé",        muscles:["Full Body"]},
-  {id:18, nom:"Pec Deck",                              eq:"Machine",      diff:"Débutant",      muscles:["Pectoraux"]},
-  {id:19, nom:"Crunch à la poulie",                    eq:"Machine",      diff:"Intermédiaire", muscles:["Abdominaux"]},
-  {id:20, nom:"Écartés poulie haute",                  eq:"Machine",      diff:"Intermédiaire", muscles:["Pectoraux"]},
-  {id:21, nom:"Pull-through",                          eq:"Machine",      diff:"Intermédiaire", muscles:["Fessiers","Lombaires"]},
-  {id:22, nom:"Woodchopper (Câble)",                   eq:"Machine",      diff:"Intermédiaire", muscles:["Obliques"]},
-  {id:23, nom:"Dips larges",                           eq:"Poids corps",  diff:"Intermédiaire", muscles:["Pectoraux","Triceps"]},
-  {id:24, nom:"Dips assistés",                         eq:"Machine",      diff:"Débutant",      muscles:["Pectoraux","Triceps"]},
-  {id:25, nom:"Relevé de jambes suspendu",             eq:"Aucun",        diff:"Avancé",        muscles:["Abdominaux"]},
-  {id:26, nom:"Élévation genoux suspendu",             eq:"Aucun",        diff:"Intermédiaire", muscles:["Abdominaux"]},
-  {id:27, nom:"Relevé de jambes (Chaise romaine)",     eq:"Machine",      diff:"Débutant",      muscles:["Abdominaux"]},
-  {id:28, nom:"Crunch vélo",                           eq:"Aucun",        diff:"Débutant",      muscles:["Abdominaux","Obliques"]},
-  {id:29, nom:"Flexion latérale haltère",              eq:"Haltère",      diff:"Débutant",      muscles:["Obliques"]},
-  {id:30, nom:"Russian Twist",                         eq:"Aucun",        diff:"Intermédiaire", muscles:["Obliques"]},
-  {id:31, nom:"Planche latérale",                      eq:"Aucun",        diff:"Débutant",      muscles:["Obliques"]},
-  {id:32, nom:"Windshield Wipers",                     eq:"Barre",        diff:"Avancé",        muscles:["Obliques","Abdominaux"]},
-  {id:33, nom:"Twist russe (Pondéré)",                 eq:"Haltère",      diff:"Intermédiaire", muscles:["Obliques"]},
-  {id:34, nom:"Gainage oblique (Côté)",                eq:"Aucun",        diff:"Débutant",      muscles:["Obliques"]},
-  {id:35, nom:"Développé militaire",                   eq:"Haltère",      diff:"Intermédiaire", muscles:["Épaules","Triceps"]},
-  {id:36, nom:"Élévation latérale machine",            eq:"Machine",      diff:"Débutant",      muscles:["Épaules"]},
-  {id:37, nom:"Élévation latérale haltères",           eq:"Haltère",      diff:"Débutant",      muscles:["Épaules"]},
-  {id:38, nom:"Arnold Press assis",                    eq:"Haltère",      diff:"Intermédiaire", muscles:["Épaules","Triceps"]},
-  {id:39, nom:"Élévation latérale assise",             eq:"Haltère",      diff:"Intermédiaire", muscles:["Épaules"]},
-  {id:40, nom:"Élévation latérale poulie",             eq:"Machine",      diff:"Intermédiaire", muscles:["Épaules"]},
-  {id:41, nom:"Face Pull (Corde)",                     eq:"Machine",      diff:"Intermédiaire", muscles:["Épaules","Trapèzes"]},
-  {id:42, nom:"Développé militaire Smith Machine",     eq:"Machine",      diff:"Débutant",      muscles:["Épaules","Triceps"]},
-  {id:43, nom:"EZ Bar Curl",                           eq:"Barre",        diff:"Débutant",      muscles:["Biceps"]},
-  {id:44, nom:"Curl Concentration",                    eq:"Haltère",      diff:"Débutant",      muscles:["Biceps"]},
-  {id:45, nom:"Développé couché serré",                eq:"Barre",        diff:"Intermédiaire", muscles:["Triceps","Pectoraux"]},
-  {id:46, nom:"Pompe diamant",                         eq:"Aucun",        diff:"Avancé",        muscles:["Triceps","Pectoraux"]},
-  {id:47, nom:"Extension triceps poulie",              eq:"Machine",      diff:"Intermédiaire", muscles:["Triceps"]},
-  {id:48, nom:"Dips machine assis",                    eq:"Machine",      diff:"Débutant",      muscles:["Triceps"]},
-  {id:49, nom:"Extension triceps haltère",             eq:"Haltère",      diff:"Débutant",      muscles:["Triceps"]},
-  {id:50, nom:"Dips assistés triceps",                 eq:"Machine",      diff:"Débutant",      muscles:["Triceps"]},
-  {id:51, nom:"Triceps Pressdown",                     eq:"Machine",      diff:"Débutant",      muscles:["Triceps"]},
-  {id:52, nom:"Curl poignet (Barre)",                  eq:"Barre",        diff:"Intermédiaire", muscles:["Avant-bras"]},
-  {id:53, nom:"Curl poignet (Haltères)",               eq:"Haltère",      diff:"Débutant",      muscles:["Avant-bras"]},
-  {id:54, nom:"Wrist Roller",                          eq:"Autres",       diff:"Intermédiaire", muscles:["Avant-bras"]},
-  {id:55, nom:"Fente latérale",                        eq:"Aucun",        diff:"Débutant",      muscles:["Quadriceps","Fessiers","Adducteurs"]},
-  {id:56, nom:"Leg Extension",                         eq:"Machine",      diff:"Débutant",      muscles:["Quadriceps"]},
-  {id:57, nom:"Fente inversée barre",                  eq:"Barre",        diff:"Intermédiaire", muscles:["Quadriceps","Fessiers"]},
-  {id:58, nom:"SDT Roumain Barre",                     eq:"Barre",        diff:"Intermédiaire", muscles:["Ischio-jambiers","Lombaires"]},
-  {id:59, nom:"SDT Roumain Haltères",                  eq:"Haltère",      diff:"Intermédiaire", muscles:["Ischio-jambiers","Fessiers"]},
-  {id:60, nom:"Abducteurs machine",                    eq:"Machine",      diff:"Débutant",      muscles:["Abducteurs"]},
-  {id:61, nom:"Adducteurs machine",                    eq:"Machine",      diff:"Débutant",      muscles:["Adducteurs"]},
-  {id:62, nom:"Chin Up",                               eq:"Aucun",        diff:"Intermédiaire", muscles:["Dos","Biceps"]},
-  {id:63, nom:"Chin Up assisté",                       eq:"Machine",      diff:"Débutant",      muscles:["Dos","Biceps"]},
-  {id:64, nom:"Rowing bûcheron",                       eq:"Haltère",      diff:"Intermédiaire", muscles:["Dos","Biceps"]},
-  {id:65, nom:"Tirage poitrine bande",                 eq:"Autres",       diff:"Débutant",      muscles:["Dos"]},
-  {id:66, nom:"Tirage poitrine poulie",                eq:"Machine",      diff:"Débutant",      muscles:["Dos","Biceps"]},
-  {id:67, nom:"Traction négative",                     eq:"Aucun",        diff:"Intermédiaire", muscles:["Dos"]},
-  {id:68, nom:"Traction classique",                    eq:"Aucun",        diff:"Avancé",        muscles:["Dos","Épaules"]},
-  {id:69, nom:"Traction prise large",                  eq:"Aucun",        diff:"Avancé",        muscles:["Dos","Épaules"]},
-  {id:70, nom:"Rowing assis large",                    eq:"Machine",      diff:"Intermédiaire", muscles:["Dos","Trapèzes"]},
-  {id:71, nom:"Rowing assis V-Grip",                   eq:"Machine",      diff:"Débutant",      muscles:["Dos"]},
-  {id:72, nom:"Rowing unilatéral poulie",              eq:"Machine",      diff:"Intermédiaire", muscles:["Dos"]},
-  {id:73, nom:"Superman Hold",                         eq:"Aucun",        diff:"Débutant",      muscles:["Lombaires"]},
-  {id:74, nom:"Banc à lombaires",                      eq:"Machine",      diff:"Débutant",      muscles:["Lombaires"]},
-  {id:75, nom:"Soulevé de terre",                      eq:"Barre",        diff:"Avancé",        muscles:["Lombaires","Fessiers"]},
-  {id:76, nom:"Trap Bar Deadlift",                     eq:"Barre",        diff:"Intermédiaire", muscles:["Lombaires","Quadriceps"]},
-  {id:77, nom:"Frog Pumps",                            eq:"Aucun",        diff:"Débutant",      muscles:["Fessiers"]},
-  {id:78, nom:"Élévation latérale jambe",              eq:"Aucun",        diff:"Débutant",      muscles:["Abducteurs"]},
-  {id:79, nom:"Hip Thrust Machine",                    eq:"Machine",      diff:"Intermédiaire", muscles:["Fessiers"]},
-  {id:80, nom:"Front Lever Hold",                      eq:"Aucun",        diff:"Expert",        muscles:["Dos","Abdominaux"]},
-  {id:81, nom:"Front Lever Raise",                     eq:"Aucun",        diff:"Expert",        muscles:["Dos","Abdominaux"]},
-  {id:82, nom:"Muscle Up",                             eq:"Aucun",        diff:"Expert",        muscles:["Dos","Triceps"]},
-  {id:83, nom:"Wall Ball",                             eq:"Autres",       diff:"Intermédiaire", muscles:["Full Body"]},
-  {id:84, nom:"Air Bike (Assault)",                    eq:"Machine",      diff:"Intermédiaire", muscles:["Cardio"]},
-  {id:85, nom:"Battle Ropes",                          eq:"Autres",       diff:"Intermédiaire", muscles:["Cardio"]},
-  {id:86, nom:"Boxe (Sac de frappe)",                  eq:"Autres",       diff:"Débutant",      muscles:["Cardio"]},
-  {id:87, nom:"Vélo elliptique",                       eq:"Machine",      diff:"Débutant",      muscles:["Cardio"]},
-  {id:88, nom:"Corde à sauter",                        eq:"Autres",       diff:"Débutant",      muscles:["Cardio"]},
-  {id:89, nom:"Rameur Concept2",                       eq:"Machine",      diff:"Intermédiaire", muscles:["Cardio","Dos"]},
-  {id:90, nom:"Spinning",                              eq:"Machine",      diff:"Intermédiaire", muscles:["Cardio"]},
-  {id:91, nom:"Course sur tapis",                      eq:"Machine",      diff:"Débutant",      muscles:["Cardio"]},
-  {id:92, nom:"HSPU (Handstand)",                      eq:"Aucun",        diff:"Expert",        muscles:["Épaules","Triceps"]},
-  {id:93, nom:"Pike Pushup",                           eq:"Aucun",        diff:"Intermédiaire", muscles:["Épaules"]},
-  {id:94, nom:"Fente sautée",                          eq:"Aucun",        diff:"Avancé",        muscles:["Quadriceps","Cardio"]},
-  {id:95, nom:"Fente marchée",                         eq:"Aucun",        diff:"Débutant",      muscles:["Quadriceps","Fessiers"]},
-  {id:96, nom:"Extension mollet 1 jambe",              eq:"Aucun",        diff:"Débutant",      muscles:["Mollets"]},
-  {id:97, nom:"Burpee over barbell",                   eq:"Barre",        diff:"Avancé",        muscles:["Full Body"]},
-  {id:98, nom:"Stairmaster",                           eq:"Machine",      diff:"Intermédiaire", muscles:["Cardio"]},
-  {id:99, nom:"Shrugs (Haltères)",                     eq:"Haltère",      diff:"Débutant",      muscles:["Trapèzes"]},
-  {id:100,nom:"Tirage menton (Barre)",                 eq:"Barre",        diff:"Intermédiaire", muscles:["Trapèzes","Épaules"]},
-];
-
+const EXERCICES = {{ exercices | tojson | safe }};
 const MUSCLES = [...new Set(EXERCICES.flatMap(e=>e.muscles))].sort();
 
 // ═══════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════
-let programmes = [
-  {id:1, nom:"Full Body Débutant",  desc:"Mouvements polyarticulaires de base.", custom:false,
-   exoIds:[10,75,56,35,12,7]},
-  {id:2, nom:"Push Pull Legs",      desc:"Organisation par chaîne musculaire.",  custom:false,
-   exoIds:[10,35,45,68,64,62,75,56,12]},
-  {id:3, nom:"Mon programme 💪",    desc:"Programme personnalisé.",               custom:true,
-   exoIds:[]},
-];
+let programmes = {{ programmes | tojson | safe }};
 
-let progActif      = null;   // programme sélectionné
-let modeEdition    = null;   // id du prog en mode "ajouter exercices"
+let progActif      = null;
+let modeEdition    = null;
 let seanceActive   = false;
-let seanceExos     = [];     // [{exo, series:[...]}]
+let seanceExos     = [];
 let filterMuscle   = '';
 let timerInterval  = null;
 let timerSec       = 0;
-let editProgId     = null;   // pour modal modifier
+let editProgId     = null;
+let seanceProgId   = null;
+let seanceDateDebut = null;
 
 // ═══════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════
 window.onload = () => { renderChips(); renderExos(); renderProgs(); };
+
+// Dropdown close on outside click
+document.addEventListener('click', e => {
+  document.querySelectorAll('.profile-dropdown.open').forEach(d => {
+    if (!d.contains(e.target)) d.classList.remove('open');
+  });
+});
 
 // ═══════════════════════════════════════════════════════════════
 // CHIPS
@@ -416,7 +343,6 @@ function filterExos() {
 
 function renderExos(list = EXERCICES) {
   const cont = document.getElementById('exo-list');
-  // IDs du programme en mode édition (pour marquer les déjà ajoutés)
   const inProgIds = modeEdition
     ? (programmes.find(p=>p.id===modeEdition)?.exoIds || [])
     : (seanceActive ? seanceExos.map(s=>s.exo.id) : []);
@@ -508,6 +434,17 @@ function toggleModeEdition(progId) {
 }
 
 function quitterModeEdition() {
+  if (modeEdition) {
+    const prog = programmes.find(p=>p.id===modeEdition);
+    if (prog && prog.custom) {
+      // Persister les exercices côté serveur
+      fetch(`/api/programme/${prog.id}/exercices`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ exoIds: prog.exoIds })
+      }).catch(err => console.error('Erreur sync exercices:', err));
+    }
+  }
   modeEdition = null;
   document.getElementById('mode-bar').classList.remove('show');
   renderProgs();
@@ -519,7 +456,6 @@ function quitterModeEdition() {
 // AJOUTER / RETIRER EXERCICE
 // ═══════════════════════════════════════════════════════════════
 function ajouterExo(id) {
-  // MODE 1 : édition programme perso
   if (modeEdition) {
     const prog = programmes.find(p=>p.id===modeEdition);
     if (!prog) return;
@@ -531,7 +467,6 @@ function ajouterExo(id) {
     showToast(`${exo.nom} ajouté au programme !`);
     return;
   }
-  // MODE 2 : séance active
   if (seanceActive) {
     const exo = EXERCICES.find(e=>e.id===id);
     if (seanceExos.find(s=>s.exo.id===id)) { showToast('Déjà dans la séance','warn'); return; }
@@ -600,7 +535,7 @@ function sauvegarderProgramme() {
   const nom  = document.getElementById('f-nom').value.trim();
   const desc = document.getElementById('f-desc').value.trim();
   const errEl = document.getElementById('err-nom');
-  // Validation
+
   if (!nom) {
     document.getElementById('f-nom').classList.add('err');
     errEl.style.display = 'block';
@@ -610,17 +545,34 @@ function sauvegarderProgramme() {
   errEl.style.display = 'none';
 
   if (editProgId) {
-    // Modifier programme existant
-    const prog = programmes.find(p=>p.id===editProgId);
-    if (prog) { prog.nom = nom; prog.desc = desc; }
-    showToast('Programme mis à jour ✓');
+    // Modifier programme existant (API)
+    fetch(`/api/programme/${editProgId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nom, desc })
+    }).then(r => r.json()).then(data => {
+      if (data.success) {
+        const prog = programmes.find(p=>p.id===editProgId);
+        if (prog) { prog.nom = nom; prog.desc = desc; }
+        renderProgs();
+        showToast('Programme mis à jour ✓');
+      }
+    }).catch(() => showToast('Erreur réseau', 'err'));
   } else {
-    // Créer nouveau programme
-    programmes.push({id:Date.now(), nom, desc, custom:true, exoIds:[]});
-    showToast('Programme créé !');
+    // Créer nouveau programme (API)
+    fetch('/api/programme', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nom, desc })
+    }).then(r => r.json()).then(data => {
+      if (data.success) {
+        programmes.push({id: data.id, nom, desc, custom: true, exoIds: []});
+        renderProgs();
+        showToast('Programme créé !');
+      }
+    }).catch(() => showToast('Erreur réseau', 'err'));
   }
   closeModal();
-  renderProgs();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -628,21 +580,30 @@ function sauvegarderProgramme() {
 // ═══════════════════════════════════════════════════════════════
 function supprimerProg(id) {
   if (!confirm('Supprimer ce programme définitivement ?')) return;
-  programmes = programmes.filter(p=>p.id!==id);
-  if (progActif?.id===id) progActif=null;
-  if (modeEdition===id) quitterModeEdition();
-  renderProgs();
-  showToast('Programme supprimé');
+  fetch(`/api/programme/${id}`, { method: 'DELETE' })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        programmes = programmes.filter(p=>p.id!==id);
+        if (progActif?.id===id) progActif=null;
+        if (modeEdition===id) { modeEdition=null; document.getElementById('mode-bar').classList.remove('show'); }
+        renderProgs();
+        renderExos();
+        showToast('Programme supprimé');
+      }
+    }).catch(() => showToast('Erreur réseau', 'err'));
 }
 
 // ═══════════════════════════════════════════════════════════════
 // SÉANCE
 // ═══════════════════════════════════════════════════════════════
 function demarrerSeance(progId) {
-  quitterModeEdition();
+  if (modeEdition) quitterModeEdition();
   const prog = programmes.find(p=>p.id===progId);
   progActif = prog;
   seanceActive = true;
+  seanceProgId = prog.id;
+  seanceDateDebut = new Date().toISOString().slice(0, 19);
   seanceExos = prog.exoIds
     .map(id=>EXERCICES.find(e=>e.id===id))
     .filter(Boolean)
@@ -724,7 +685,6 @@ function renderSeance() {
     </div>`).join('');
 }
 
-// VALIDATION INPUTS
 function val(input, min, max) {
   const v = parseFloat(input.value);
   if (input.value!=='' && (isNaN(v)||v<min||v>max)) {
@@ -739,18 +699,61 @@ function val(input, min, max) {
 function terminerSeance() {
   if (!seanceActive) { showToast('Aucune séance en cours','warn'); return; }
   if (!seanceExos.length) { showToast('Ajoute au moins un exercice','warn'); return; }
+
   let ok = true;
   seanceExos.forEach(({series})=>series.forEach(s=>{if(!s.poids||!s.reps)ok=false;}));
   if (!ok) { showToast('⚠️ Remplis tous les poids et reps','warn'); return; }
-  clearInterval(timerInterval);
-  seanceActive = false;
-  seanceExos = [];
-  timerSec = 0;
-  document.getElementById('timer').textContent = '00:00';
-  document.getElementById('seance-prog-name').textContent = '— Aucun programme';
-  renderSeance();
-  renderExos();
-  showToast('✅ Séance enregistrée !');
+
+  const dateFin = new Date().toISOString().slice(0, 19);
+
+  const seriesPayload = [];
+  seanceExos.forEach(({exo, series}) => {
+    series.forEach(s => {
+      seriesPayload.push({
+        id_ex:      exo.id,
+        poids:      parseFloat(s.poids) || 0,
+        reps:       parseInt(s.reps) || 0,
+        rpe:        s.rpe ? parseFloat(s.rpe) : null,
+        type_serie: s.type || 'normale'
+      });
+    });
+  });
+
+  const payload = {
+    id_programme: seanceProgId,
+    date_debut:   seanceDateDebut,
+    date_fin:     dateFin,
+    series:       seriesPayload
+  };
+
+  fetch('/api/seance', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(res => {
+    if (res.status === 401) { showToast('⚠️ Connecte-toi pour sauvegarder', 'err'); throw new Error('401'); }
+    return res.json();
+  })
+  .then(data => {
+    if (data.success) showToast('✅ Séance enregistrée !');
+    else showToast('⚠️ ' + (data.error || 'Erreur'), 'err');
+  })
+  .catch(err => {
+    if (err.message !== '401') showToast('❌ Erreur réseau', 'err');
+  })
+  .finally(() => {
+    clearInterval(timerInterval);
+    seanceActive = false;
+    seanceExos = [];
+    seanceProgId = null;
+    seanceDateDebut = null;
+    timerSec = 0;
+    document.getElementById('timer').textContent = '00:00';
+    document.getElementById('seance-prog-name').textContent = '— Aucun programme';
+    renderSeance();
+    renderExos();
+  });
 }
 
 function annulerSeance() {
@@ -759,6 +762,8 @@ function annulerSeance() {
   clearInterval(timerInterval);
   seanceActive = false;
   seanceExos = [];
+  seanceProgId = null;
+  seanceDateDebut = null;
   timerSec = 0;
   document.getElementById('timer').textContent = '00:00';
   document.getElementById('seance-prog-name').textContent = '— Aucun programme';
@@ -778,12 +783,10 @@ function showToast(msg, type='') {
   toastTimer = setTimeout(()=>t.classList.remove('show'), 2800);
 }
 
-// Fermer modal en cliquant dehors
 document.getElementById('modal-prog').addEventListener('click', function(e){
   if(e.target===this) closeModal();
 });
 
-// Enter dans le champ nom
 document.getElementById('f-nom').addEventListener('keydown', e=>{
   if(e.key==='Enter') sauvegarderProgramme();
 });

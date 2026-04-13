@@ -3,143 +3,163 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>IronTrack — Accueil</title>
+  <title>IronTrack</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
-  <!-- ../static/ pour Live Server (html/ → static/) -->
-  <!-- Quand Flask sera prêt, changer en /static/style.css -->
-  <link rel="stylesheet" href="../static/style.css"/>
   <style>
-    /* ═══════════════════════════════════════════════════════════
-       index.html — styles spécifiques à la page d'accueil
-       ═══════════════════════════════════════════════════════════ */
+    :root {
+      --bg: #111;
+      --surface: #1a1a1a;
+      --surface2: #222;
+      --border: #2e2e2e;
+      --text: #f0f0f0;
+      --muted: #777;
+      --accent: #e8ff47;
+      --green: #4ade80;
+      --red: #f87171;
+      --orange: #fb923c;
+      --purple: #c084fc;
+      --radius: 12px;
+    }
 
-    .hamburger {
-      display: none;
-      background: none;
-      border: none;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
       color: var(--text);
-      font-size: 1.4rem;
-      cursor: pointer;
+      min-height: 100vh;
     }
 
-    /* ── Hero ──────────────────────────────────────────────────── */
-    .hero {
-      max-width: 700px;
-      margin: 0 auto;
-      padding: 5rem 2rem 2rem;
-      text-align: center;
+    /* NAV */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.1rem 2rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
-    .hero-badge {
-      display: inline-block;
-      font-size: .65rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1.8px;
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 800;
       color: var(--accent);
-      background: rgba(232,255,71,.06);
-      border: 1px solid rgba(232,255,71,.15);
-      padding: .35rem 1.1rem;
-      border-radius: 99px;
-      margin-bottom: 1.8rem;
+      text-decoration: none;
+    }
+
+    .nav-links { display: flex; gap: 1.8rem; list-style: none; }
+    .nav-links a { text-decoration: none; color: var(--muted); font-size: .88rem; font-weight: 500; transition: color .2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+
+    .nav-right { display: flex; gap: .7rem; align-items: center; }
+
+    .btn { padding: .5rem 1.1rem; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: .85rem; font-weight: 600; cursor: pointer; border: none; transition: all .2s; }
+    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn-ghost:hover { border-color: var(--text); }
+    .btn-accent { background: var(--accent); color: #111; }
+    .btn-accent:hover { background: #d4eb30; }
+    .btn-lg { padding: .75rem 1.8rem; font-size: .95rem; }
+
+    .nav-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--accent); color: #111;
+      display: grid; place-items: center;
+      font-weight: 700; font-size: .8rem;
+      flex-shrink: 0; cursor: pointer;
+    }
+
+    /* DROPDOWN */
+    .profile-dropdown { position: relative; }
+    .dropdown-menu {
+      display: none; position: absolute; top: 44px; right: 0;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); min-width: 200px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.5); z-index: 200;
+      overflow: hidden;
+    }
+    .profile-dropdown.open .dropdown-menu { display: block; }
+    .dropdown-header { padding: .9rem 1rem .5rem; font-weight: 700; font-size: .82rem; color: var(--accent); border-bottom: 1px solid var(--border); }
+    .dropdown-item { display: block; padding: .6rem 1rem; font-size: .82rem; color: var(--text); text-decoration: none; transition: background .15s; }
+    .dropdown-item:hover { background: var(--surface2); }
+    .dropdown-danger { color: var(--red); }
+    .dropdown-danger:hover { background: rgba(248,113,113,.08); }
+    .dropdown-divider { border-top: 1px solid var(--border); margin: .3rem 0; }
+
+    /* LOGIN OVERLAY */
+    .login-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:200; align-items:center; justify-content:center }
+    .login-overlay.open { display:flex }
+
+    /* HERO */
+    .hero {
+      max-width: 800px;
+      margin: 5rem auto;
+      padding: 0 2rem;
+      text-align: center;
     }
 
     .hero h1 {
       font-family: 'Syne', sans-serif;
-      font-size: 3.2rem;
+      font-size: 3.8rem;
       font-weight: 800;
-      line-height: 1.08;
-      letter-spacing: -1.5px;
+      line-height: 1.1;
+      letter-spacing: -1px;
       margin-bottom: 1.2rem;
     }
 
     .hero h1 span { color: var(--accent); }
 
-    .hero-sub {
-      font-size: .92rem;
+    .hero p {
+      font-size: 1rem;
       color: var(--muted);
       line-height: 1.7;
-      max-width: 440px;
-      margin: 0 auto 2.2rem;
+      max-width: 500px;
+      margin: 0 auto 2rem;
     }
 
-    .hero-btns {
-      display: flex;
-      gap: .7rem;
-      justify-content: center;
-      flex-wrap: wrap;
+    .hero-btns { display: flex; gap: .8rem; justify-content: center; }
+    .hero-note { margin-top: 1rem; font-size: .8rem; color: var(--muted); }
+
+    /* IMC */
+    .imc-section { max-width: 650px; margin: 0 auto 4rem; padding: 0 2rem; }
+
+    .imc-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.8rem;
     }
 
-    /* ── Quick stats ───────────────────────────────────────────── */
-    .quick-stats {
-      display: flex;
-      justify-content: center;
-      gap: 2.5rem;
-      padding: 2rem 2rem 3rem;
-      max-width: 550px;
-      margin: 0 auto;
+    .imc-box h2 { font-family: 'Syne', sans-serif; font-size: 1.2rem; margin-bottom: .3rem; }
+    .imc-box > p { font-size: .82rem; color: var(--muted); margin-bottom: 1.3rem; }
+
+    .imc-form { display: grid; grid-template-columns: 1fr 1fr auto; gap: .8rem; align-items: end; }
+
+    .field label { display: block; font-size: .72rem; font-weight: 600; color: var(--muted); margin-bottom: .35rem; text-transform: uppercase; letter-spacing: .5px; }
+
+    .field input {
+      width: 100%;
+      padding: .62rem .9rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: .9rem;
+      background: var(--surface2);
+      color: var(--text);
+      outline: none;
+      transition: border-color .2s;
     }
 
-    .qs { text-align: center; }
-
-    .qs-val {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--accent);
-      line-height: 1;
-    }
-
-    .qs-label {
-      font-size: .65rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .4px;
-      margin-top: .35rem;
-      font-weight: 600;
-    }
-
-    /* ── IMC Card ──────────────────────────────────────────────── */
-    .imc-wrap {
-      max-width: 700px;
-      margin: 0 auto;
-      padding: 0 2rem 3rem;
-    }
-
-    .imc-card-head {
-      display: flex;
-      align-items: center;
-      gap: .8rem;
-      margin-bottom: 1.4rem;
-    }
-
-    .imc-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 9px;
-      background: rgba(232,255,71,.08);
-      display: grid;
-      place-items: center;
-      font-size: 1rem;
-      flex-shrink: 0;
-    }
-
-    .imc-title { font-weight: 700; font-size: .92rem; }
-    .imc-sub   { font-size: .73rem; color: var(--muted); margin-top: .1rem; }
-
-    .imc-form {
-      display: grid;
-      grid-template-columns: 1fr 1fr auto;
-      gap: .8rem;
-      align-items: end;
-    }
+    .field input:focus { border-color: var(--accent); }
 
     .imc-result {
-      margin-top: 1.2rem;
-      padding: 1.1rem 1.4rem;
+      margin-top: 1rem;
+      padding: 1rem 1.2rem;
       background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 8px;
       display: none;
       align-items: center;
       justify-content: space-between;
@@ -148,127 +168,61 @@
     }
 
     .imc-result.show { display: flex; }
+    .imc-number { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--accent); }
+    .imc-cat { font-size: .85rem; color: var(--muted); }
 
-    .imc-number {
-      font-family: 'Syne', sans-serif;
-      font-size: 2.2rem;
-      font-weight: 800;
-      color: var(--accent);
-      line-height: 1;
-    }
+    hr.div { border: none; border-top: 1px solid var(--border); margin: 0 2rem; }
 
-    .imc-cat {
-      font-size: .85rem;
-      color: var(--muted);
-      font-weight: 500;
-    }
+    /* FORM */
+    .form-section { max-width: 500px; margin: 0 auto; padding: 3rem 2rem; }
 
-    .imc-result-label {
-      font-size: .65rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .4px;
-      margin-bottom: .25rem;
-      font-weight: 600;
-    }
-
-    /* ── Features grid ─────────────────────────────────────────── */
-    .features-wrap {
-      max-width: 700px;
-      margin: 0 auto;
-      padding: 2.5rem 2rem;
-    }
-
-    .features-title {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.15rem;
-      font-weight: 800;
-      margin-bottom: 1.2rem;
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: .6rem;
-    }
-
-    .feature-card {
+    .form-box {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 1.2rem;
-      transition: border-color .2s;
-      text-decoration: none;
-      color: inherit;
+      padding: 2rem;
     }
 
-    .feature-card:hover { border-color: var(--accent); }
+    .form-box h2 { font-family: 'Syne', sans-serif; font-size: 1.3rem; margin-bottom: .3rem; }
+    .form-box > p { font-size: .8rem; color: var(--muted); margin-bottom: 1.5rem; }
+    .form-group { margin-bottom: .9rem; }
+    .form-group label { display: block; font-size: .72rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: .35rem; }
 
-    .feature-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      display: grid;
-      place-items: center;
-      font-size: .95rem;
-      flex-shrink: 0;
-      margin-bottom: .8rem;
-    }
-
-    .feature-icon.fi-1 { background: rgba(232,255,71,.08); }
-    .feature-icon.fi-2 { background: rgba(74,222,128,.08); }
-    .feature-icon.fi-3 { background: rgba(251,146,60,.08); }
-    .feature-icon.fi-4 { background: rgba(192,132,252,.08); }
-
-    .feature-name { font-weight: 700; font-size: .85rem; margin-bottom: .25rem; }
-    .feature-desc { font-size: .72rem; color: var(--muted); line-height: 1.5; }
-
-    /* ── Inscription Card ──────────────────────────────────────── */
-    .inscr-wrap {
-      max-width: 460px;
-      margin: 0 auto;
-      padding: 2.5rem 2rem 3rem;
-    }
-
-    .inscr-head {
-      display: flex;
-      align-items: center;
-      gap: .7rem;
-      margin-bottom: 1.4rem;
-    }
-
-    .inscr-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 9px;
-      background: rgba(74,222,128,.08);
-      display: grid;
-      place-items: center;
-      font-size: 1rem;
-      flex-shrink: 0;
-    }
-
-    .inscr-title { font-weight: 700; font-size: .92rem; }
-    .inscr-sub   { font-size: .73rem; color: var(--muted); margin-top: .1rem; }
-
-    .btn-submit {
+    .form-group input, .form-group select {
       width: 100%;
-      padding: .78rem;
-      font-size: .9rem;
-      margin-top: .5rem;
+      padding: .62rem .9rem;
+      border: 1px solid var(--border);
       border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: .88rem;
+      background: var(--surface2);
+      color: var(--text);
+      outline: none;
+      transition: border-color .2s;
     }
 
-    .login-link {
-      text-align: center;
-      font-size: .75rem;
-      color: var(--muted);
-      margin-top: .9rem;
+    .form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+    .form-group select option { background: var(--surface2); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+    .btn-submit { width: 100%; padding: .78rem; font-size: .92rem; margin-top: .4rem; border-radius: 8px; }
+
+    /* FLASH */
+    .flash-container {
+      position: fixed; top: 4.5rem; right: 1.5rem; z-index: 999;
+      display: flex; flex-direction: column; gap: .5rem; max-width: 360px;
     }
+    .flash {
+      padding: .75rem 1.1rem; border-radius: 8px; font-size: .85rem; font-weight: 500;
+      border: 1px solid transparent; animation: slideIn .25s ease;
+    }
+    @keyframes slideIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+    .flash-success { background: rgba(74,222,128,.12); border-color: rgba(74,222,128,.3); color: var(--green); }
+    .flash-error   { background: rgba(248,113,113,.12); border-color: rgba(248,113,113,.3); color: var(--red); }
 
-    .login-link a { color: var(--text); font-weight: 600; }
+    .hamburger { display: none; background: none; border: none; color: var(--text); font-size: 1.4rem; cursor: pointer; }
 
-    /* ── Responsive ────────────────────────────────────────────── */
+    footer { text-align: center; padding: 2rem; font-size: .75rem; color: var(--muted); border-top: 1px solid var(--border); margin-top: 2rem; }
+
     @media (max-width: 768px) {
       .nav-links {
         position: fixed; top: 60px; left: 0; right: 0;
@@ -278,177 +232,112 @@
       }
       .nav-links.open { transform: translateY(0); }
       .hamburger { display: block; }
-      .hero { padding: 3rem 1.5rem 1.5rem; }
-      .hero h1 { font-size: 2.2rem; letter-spacing: -1px; }
-      .quick-stats { gap: 1.2rem; flex-wrap: wrap; }
+      .hero h1 { font-size: 2.4rem; }
       .imc-form { grid-template-columns: 1fr; }
-      .features-grid { grid-template-columns: 1fr; }
-      .imc-wrap, .features-wrap, .inscr-wrap { padding-left: 1.2rem; padding-right: 1.2rem; }
+      .form-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-<!-- ═══════ NAV ═══════ -->
-<nav>
-  <a href="/" class="logo">IronTrack</a>
-  <ul class="nav-links" id="navLinks">
-    <li><a href="index.html" class="active">Accueil</a></li>
-    <li><a href="mes_programmes.html">Mes Programmes</a></li>
-    <li><a href="securite.html">Mon compte</a></li>
-    <li><a href="statistique.html">Statistiques</a></li>
-  </ul>
-  <div class="nav-right">
-    <!--
-      Flask (connecté) :
-        <div class="nav-avatar" id="nav-avatar" data-pseudo="{{ user.pseudo }}"></div>
-      Flask (visiteur) :
-    -->
-    <a href="#inscription" class="btn btn-ghost">Connexion</a>
-    <a href="#inscription" class="btn btn-accent">S'inscrire</a>
-    <button class="hamburger" id="hamburger" aria-label="Menu">☰</button>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="flash-container">
+    {% for category, message in messages %}
+      <div class="flash flash-{{ category }}">{{ message }}</div>
+    {% endfor %}
   </div>
-</nav>
+  {% endif %}
+{% endwith %}
 
-<!-- ═══════ HERO ═══════ -->
+{% set active_page = 'accueil' %}
+{% include 'navbar.html' %}
+
+<!-- HERO -->
 <div class="hero">
-  <div class="hero-badge">Projet GLO-2005 · Université Laval</div>
   <h1>Suivez votre<br><span>entraînement</span></h1>
-  <p class="hero-sub">Calculez votre IMC, choisissez un programme et enregistrez chaque séance. Créez un compte pour sauvegarder votre progression.</p>
+  <p>Calculez votre IMC, explorez les exercices et suivez vos séances. Connectez-vous pour sauvegarder votre progression.</p>
   <div class="hero-btns">
-    <a href="#imc" class="btn btn-accent btn-lg">Calculer mon IMC</a>
-    <a href="mes_programmes.html" class="btn btn-ghost btn-lg">Mes programmes</a>
+    {% if session.get('user_id') %}
+      <a href="/programmes" class="btn btn-accent btn-lg" style="text-decoration:none">Mes Programmes</a>
+      <a href="/statistiques" class="btn btn-ghost btn-lg" style="text-decoration:none">Mon Suivi</a>
+    {% else %}
+      <a href="#inscription" class="btn btn-accent btn-lg" style="text-decoration:none">Commencer</a>
+      <a href="/explorer" class="btn btn-ghost btn-lg" style="text-decoration:none">Explorer</a>
+    {% endif %}
   </div>
+  <div class="hero-note">Pas besoin de compte pour calculer votre IMC 👇</div>
 </div>
 
-<!-- ═══════ Chiffres BD ═══════ -->
-<div class="quick-stats">
-  <div class="qs">
-    <div class="qs-val">20</div>
-    <div class="qs-label">Utilisateurs</div>
-  </div>
-  <div class="qs">
-    <div class="qs-val">100</div>
-    <div class="qs-label">Exercices</div>
-  </div>
-  <div class="qs">
-    <div class="qs-val">20</div>
-    <div class="qs-label">Programmes</div>
-  </div>
-  <div class="qs">
-    <div class="qs-val">20</div>
-    <div class="qs-label">Muscles</div>
-  </div>
-</div>
-
-<hr class="div"/>
-
-<!-- ═══════ CALCULATEUR IMC ═══════ -->
-<div class="imc-wrap" id="imc">
-  <div class="card">
-    <div class="imc-card-head">
-      <div class="imc-icon">⚖️</div>
-      <div>
-        <div class="imc-title">Calculer mon IMC</div>
-        <div class="imc-sub">Aucun compte requis — connectez-vous pour sauvegarder.</div>
-      </div>
-    </div>
-
+<!-- IMC -->
+<div class="imc-section" id="imc">
+  <div class="imc-box">
+    <h2>Calculer mon IMC</h2>
+    <p>Aucun compte requis. Connectez-vous pour sauvegarder le résultat dans votre profil.</p>
     <div class="imc-form">
-      <div class="form-group">
-        <label for="taille">Taille (cm)</label>
+      <div class="field">
+        <label>Taille (cm)</label>
         <input type="number" id="taille" placeholder="175" min="50" max="250"/>
       </div>
-      <div class="form-group">
-        <label for="poids">Poids (kg)</label>
+      <div class="field">
+        <label>Poids (kg)</label>
         <input type="number" id="poids" placeholder="72.5" min="20" max="300" step="0.1"/>
       </div>
-      <button class="btn btn-accent" onclick="calculerIMC()" style="align-self:end;padding:.62rem 1.4rem">Calculer</button>
+      <button class="btn btn-accent" onclick="calculerIMC()" style="padding:.62rem 1.2rem">Calculer</button>
     </div>
-
     <div class="imc-result" id="imc-result">
       <div>
-        <div class="imc-result-label">Votre IMC</div>
-        <div class="imc-number" id="imc-val">&mdash;</div>
+        <div style="font-size:.72rem;color:var(--muted);margin-bottom:.2rem">Votre IMC</div>
+        <div class="imc-number" id="imc-val">—</div>
       </div>
-      <div class="imc-cat" id="imc-cat">&mdash;</div>
-      <a href="#inscription" class="btn btn-ghost btn-sm">Sauvegarder &rarr;</a>
+      <div class="imc-cat" id="imc-cat">—</div>
+      {% if session.get('user_id') %}
+        <span class="btn btn-ghost" style="font-size:.78rem;opacity:.5;cursor:default">IMC sauvegardé ✓</span>
+      {% else %}
+        <button class="btn btn-ghost" style="font-size:.78rem" onclick="document.getElementById('login-overlay').classList.add('open')">Connexion pour sauvegarder →</button>
+      {% endif %}
     </div>
   </div>
 </div>
 
+{% if not session.get('user_id') %}
 <hr class="div"/>
 
-<!-- ═══════ Ce que vous pouvez faire ═══════ -->
-<div class="features-wrap">
-  <div class="features-title">Ce que vous pouvez faire</div>
-  <div class="features-grid">
-    <a href="mes_programmes.html" class="feature-card">
-      <div class="feature-icon fi-1">🏋️</div>
-      <div class="feature-name">Programmes &amp; Exercices</div>
-      <div class="feature-desc">Explorez 20 programmes et 100 exercices. Créez vos propres programmes personnalisés.</div>
-    </a>
-    <a href="statistique.html" class="feature-card">
-      <div class="feature-icon fi-2">📊</div>
-      <div class="feature-name">Statistiques</div>
-      <div class="feature-desc">Volume total, progression hebdomadaire, calendrier d'entraînement et séances récentes.</div>
-    </a>
-    <a href="mes_programmes.html" class="feature-card">
-      <div class="feature-icon fi-3">📝</div>
-      <div class="feature-name">Suivi de séance</div>
-      <div class="feature-desc">Enregistrez vos séries, poids, reps et RPE en temps réel avec un chronomètre intégré.</div>
-    </a>
-    <a href="securite.html" class="feature-card">
-      <div class="feature-icon fi-4">🔒</div>
-      <div class="feature-name">Compte sécurisé</div>
-      <div class="feature-desc">Mot de passe chiffré, profil privé, gestion complète de vos données personnelles.</div>
-    </a>
-  </div>
-</div>
-
-<hr class="div"/>
-
-<!-- ═══════ INSCRIPTION ═══════ -->
-<div class="inscr-wrap" id="inscription">
-  <div class="card">
-    <div class="inscr-head">
-      <div class="inscr-icon">👤</div>
-      <div>
-        <div class="inscr-title">Créer un compte</div>
-        <div class="inscr-sub">Sauvegardez votre IMC, suivez vos séances et battez vos records.</div>
-      </div>
-    </div>
-
-    <form method="POST" action="/inscription" id="inscription-form">
+<!-- INSCRIPTION -->
+<div class="form-section" id="inscription">
+  <div class="form-box">
+    <h2>Créer un compte</h2>
+    <p>Connectez-vous pour sauvegarder votre IMC, suivre vos séances et battre vos records personnels.</p>
+    <form method="POST" action="/inscription">
       <div class="form-group">
-        <label for="pseudo">Pseudo</label>
-        <input type="text" id="pseudo" name="pseudo" placeholder="ex: john_doe" maxlength="50" required/>
+        <label>Pseudo</label>
+        <input type="text" name="pseudo" placeholder="ex: john_doe" maxlength="50" required/>
       </div>
       <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" placeholder="ex: john@email.com" required/>
+        <label>Email</label>
+        <input type="email" name="email" placeholder="ex: john@email.com" required/>
       </div>
       <div class="form-group">
-        <label for="mdp">Mot de passe</label>
-        <input type="password" id="mdp" name="mdp" placeholder="Min. 8 caractères" minlength="8" required/>
+        <label>Mot de passe</label>
+        <input type="password" name="mdp" placeholder="••••••••" minlength="8" required/>
       </div>
       <div class="form-group">
-        <label for="date_naissance">Date de naissance</label>
-        <input type="date" id="date_naissance" name="date_naissance" required/>
+        <label>Date de naissance</label>
+        <input type="date" name="date_naissance" required/>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label for="taille_inscr">Taille (cm)</label>
-          <input type="number" id="taille_inscr" name="taille" placeholder="175" min="50" max="250" required/>
+          <label>Taille (cm)</label>
+          <input type="number" name="taille" placeholder="175" min="50" max="250" required/>
         </div>
         <div class="form-group">
-          <label for="poids_inscr">Poids (kg)</label>
-          <input type="number" id="poids_inscr" name="poids" placeholder="72.5" min="20" max="300" step="0.1" required/>
+          <label>Poids (kg)</label>
+          <input type="number" name="poids" placeholder="72.5" min="20" max="300" step="0.1" required/>
         </div>
       </div>
       <div class="form-group">
-        <label for="sexe">Sexe</label>
-        <select id="sexe" name="sexe" required>
+        <label>Sexe</label>
+        <select name="sexe" required>
           <option value="">-- Choisir --</option>
           <option value="homme">Homme</option>
           <option value="femme">Femme</option>
@@ -457,20 +346,52 @@
       </div>
       <button type="submit" class="btn btn-accent btn-submit">Créer mon compte</button>
     </form>
-
-    <p class="login-link">
-      Déjà un compte ? <a href="/connexion">Se connecter</a>
+    <p style="text-align:center;font-size:.75rem;color:var(--muted);margin-top:.8rem">
+      Déjà un compte ? <a href="#" style="color:var(--text);font-weight:600" onclick="event.preventDefault();document.getElementById('login-overlay').classList.add('open')">Se connecter</a>
     </p>
   </div>
 </div>
+{% endif %}
 
 <footer>
   IronTrack — Projet GLO-2005 · Hachim · Melvin · Abdelali · Fabrice
 </footer>
 
-<!-- ../static/ pour Live Server -->
-<!-- Quand Flask sera prêt, changer en /static/main.js -->
-<script src="../static/main.js"></script>
+<script>
+  function calculerIMC() {
+    const taille = parseFloat(document.getElementById('taille').value);
+    const poids  = parseFloat(document.getElementById('poids').value);
+    if (!taille || !poids || taille < 50 || taille > 250 || poids < 20 || poids > 300) {
+      alert('Veuillez entrer une taille (50–250 cm) et un poids (20–300 kg) valides.');
+      return;
+    }
+    const imc = poids / ((taille / 100) * (taille / 100));
+    let cat = '';
+    if      (imc < 18.5) cat = 'Sous-poids';
+    else if (imc < 25)   cat = 'Poids normal ✓';
+    else if (imc < 30)   cat = 'Surpoids';
+    else                 cat = 'Obésité';
+    document.getElementById('imc-val').textContent = imc.toFixed(2);
+    document.getElementById('imc-cat').textContent = cat;
+    document.getElementById('imc-result').classList.add('show');
+  }
+
+  // Hamburger
+  const hb = document.getElementById('hamburger');
+  if (hb) hb.addEventListener('click', () => document.getElementById('navLinks').classList.toggle('open'));
+
+  // Dropdown close on outside click
+  document.addEventListener('click', e => {
+    document.querySelectorAll('.profile-dropdown.open').forEach(d => {
+      if (!d.contains(e.target)) d.classList.remove('open');
+    });
+  });
+
+  // Flash auto-dismiss
+  document.querySelectorAll('.flash').forEach(el => {
+    setTimeout(() => { el.style.transition='opacity .4s'; el.style.opacity='0'; setTimeout(()=>el.remove(),400); }, 4000);
+  });
+</script>
 
 </body>
 </html>

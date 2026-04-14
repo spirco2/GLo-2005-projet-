@@ -9,9 +9,6 @@ import os
 
 app = Flask(
     __name__,
-    template_folder='templates',
-    static_folder='static',
-    static_url_path='/static'
 )
 
 app.secret_key = os.environ.get('SECRET_KEY', 'irontrack-dev-secret-key-change-me')
@@ -64,6 +61,7 @@ def duree_humaine(seconds):
 
 # ── Blueprints ────────────────────────────────────────────────
 from routes.acceuil import bp as acceuil_bp
+from routes.explorer import bp as explorer_bp
 from routes.securite import bp as securite_bp
 from routes.programmes import bp as programmes_bp
 from routes.suivi import bp as suivi_bp
@@ -71,6 +69,7 @@ from routes.admin import bp as admin_bp
 
 
 app.register_blueprint(acceuil_bp)
+app.register_blueprint(explorer_bp)
 app.register_blueprint(securite_bp)
 app.register_blueprint(programmes_bp)
 app.register_blueprint(suivi_bp)

@@ -95,6 +95,19 @@ SOURCE database/4_programme.sql;
 SOURCE database/5_serie_log.sql;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+## 1.1 FORMAT ENV
+
+DB_HOST=127.0.0.1
+
+DB_USER=root
+
+DB_PASSWORD=MDP
+
+DB_NAME=db_local
+
+DB_PORT=3306
+
 2. Lancer l'application
 Bash
 pip install -r requirements.txt
@@ -112,4 +125,3 @@ Routines SQL : 2 procédures (imc_de_utilisateur, calculer_volume_seance) et 2 t
 
 Sécurité : Hachage scrypt via Werkzeug et protection contre l'injection SQL via requêtes paramétrées.
 ```bash
-

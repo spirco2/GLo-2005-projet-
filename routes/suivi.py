@@ -84,7 +84,7 @@ def statistiques():
                            WHERE s.id_user = %s
                            ORDER BY s.date_debut DESC LIMIT 5
                            """, (user_id,))
-            recent_workouts = cursor.fetchall()
+        recent_workouts = cursor.fetchall()
         # ── Calendrier du mois courant ─────────────────────
         today = datetime.now()
         cursor.execute("""

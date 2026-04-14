@@ -65,26 +65,28 @@ def statistiques():
         for w in weekly_raw:
             pct = int((w['minutes'] / max_min) * 100)
             weekly_data.append({
-                'label_date': w['label_date'],   # datetime brut → filtré en Jinja2
+                'label_date': w['label_date'],
                 'minutes':    int(w['minutes']),
                 'pct':        pct
             })
 
-            # ── Séances récentes (requête imbriquée GLO-2005) ─────
-            cursor.execute("""
-                           SELECT s.id_seance,
-                                  p.nom_programme                     AS name,
-                                  s.date_debut,
-                                  (SELECT COUNT(DISTINCT sl2.id_ex)
-                                   FROM serie_log sl2
-                                   WHERE sl2.id_seance = s.id_seance) AS nb_exercises,
-                                  TIME_TO_SEC(s.duree)                AS duree_sec
-                           FROM seance s
-                                    JOIN programme p ON s.id_programme = p.id_programme
-                           WHERE s.id_user = %s
-                           ORDER BY s.date_debut DESC LIMIT 5
-                           """, (user_id,))
-            recent_workouts = cursor.fetchall()
+        # ── Séances récentes (requête imbriquée GLO-2005) ─────
+        cursor.execute("""
+            SELECT s.id_seance,
+                   p.nom_programme         AS name,
+                   s.date_debut,
+                   (SELECT COUNT(DISTINCT sl2.id_ex)
+                    FROM serie_log sl2
+                    WHERE sl2.id_seance = s.id_seance) AS nb_exercises,
+                   TIME_TO_SEC(s.duree)     AS duree_sec
+            FROM seance s
+            JOIN programme p ON s.id_programme = p.id_programme
+            WHERE s.id_user = %s
+            ORDER BY s.date_debut DESC
+            LIMIT 5
+        """, (user_id,))
+        recent_workouts = cursor.fetchall()
+
         # ── Calendrier du mois courant ─────────────────────
         today = datetime.now()
         cursor.execute("""

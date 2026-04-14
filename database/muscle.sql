@@ -46,5 +46,50 @@ CREATE INDEX idx_categorie ON Muscles(categorie);
 
 -- Vérification
 SELECT * FROM Muscles;
+-- =============================================
+-- REQUÊTES AVANCÉES (Évaluation GLO-2005)
+-- Table : Muscles + jointures avec cibler, exercice
+-- =============================================
 
+-- 1. Nombre de muscles par catégorie (agrégation GROUP BY)
+SELECT categorie, COUNT(*) AS nb_muscles
+FROM Muscles
+GROUP BY categorie
+ORDER BY nb_muscles DESC;
+
+-- 2. Liste complète triée par catégorie (tri multi-colonnes)
+SELECT categorie, nom_muscle
+FROM Muscles
+ORDER BY categorie, nom_muscle;
+
+-- 3. Muscles travaillés par un exercice donné (jointure 3 tables)
+SELECT e.nom AS exercice, m.nom_muscle, m.categorie
+FROM exercice e
+JOIN cibler c ON e.id_ex = c.id_ex
+JOIN Muscles m ON c.id_muscle = m.id_muscle
+WHERE e.id_ex = 10;
+
+-- 4. Catégorie la plus travaillée dans tout le projet
+--    (agrégation + jointure + tri)
+SELECT m.categorie, COUNT(*) AS nb_fois_ciblee
+FROM cibler c
+JOIN Muscles m ON c.id_muscle = m.id_muscle
+GROUP BY m.categorie
+ORDER BY nb_fois_ciblee DESC;
+
+-- 5. Muscles jamais ciblés par aucun exercice (sous-requête NOT IN)
+SELECT nom_muscle, categorie
+FROM Muscles
+WHERE id_muscle NOT IN (
+    SELECT DISTINCT id_muscle FROM cibler
+);
+
+-- 6. Nombre d'exercices par muscle individuel (jointure + agrégation)
+SELECT m.nom_muscle,
+       m.categorie,
+       COUNT(c.id_ex) AS nb_exercices
+FROM Muscles m
+LEFT JOIN cibler c ON m.id_muscle = c.id_muscle
+GROUP BY m.id_muscle
+ORDER BY nb_exercices DESC;
 SET FOREIGN_KEY_CHECKS = 1;

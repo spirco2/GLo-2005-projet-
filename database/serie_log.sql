@@ -215,5 +215,105 @@ CREATE INDEX idx_pr_date        ON record_personnel(date_record);
 
 -- Vérification
 SELECT * FROM record_personnel ORDER BY date_record DESC LIMIT 10;
+-- =============================================
+-- SÉRIES SUPPLÉMENTAIRES (séances 14, 15, 16)
+-- Porte le total au-delà de 100 tuples
+-- =============================================
 
+INSERT INTO serie_log (id_seance, id_ex, poids, reps, rpe, type_serie) VALUES
+-- Séance 14 (user 108 · Préparation Marathon)
+(14, 91, 0.00,  30, 6.0, 'normale'),
+(14, 98, 0.00,  20, 7.0, 'normale'),
+(14, 88, 0.00,  50, 6.5, 'normale'),
+(14, 95, 0.00,  20, 7.0, 'normale'),
+
+-- Séance 15 (user 105 · Cross-Training)
+(15, 17, 0.00,  12, 7.5, 'normale'),
+(15, 85, 0.00,  15, 8.0, 'normale'),
+(15, 84, 0.00,  10, 8.5, 'echec'),
+(15, 88, 0.00,  40, 6.0, 'normale'),
+
+-- Séance 16 (user 101 · Full Body semaine 4)
+(16, 10, 85.00,  5, 8.5, 'normale'),
+(16, 10, 90.00,  3, 9.5, 'normale'),
+(16, 75, 115.00, 4, 9.0, 'normale'),
+(16, 56, 60.00, 10, 7.5, 'normale');
+
+
+-- =============================================================
+-- REQUÊTES AVANCÉES (Évaluation GLO-2005)
+-- Tables : serie_log, record_personnel, seance, exercice, Utilisateurs
+-- =============================================================
+
+-- 1. Volume total soulevé par utilisateur (agrégation + jointure 3 tables)
+SELECT u.pseudo,
+       SUM(sl.poids * sl.reps) AS volume_total_kg
+FROM serie_log sl
+JOIN seance       s ON sl.id_seance = s.id_seance
+JOIN Utilisateurs u ON s.id_user    = u.id
+GROUP BY u.pseudo
+ORDER BY volume_total_kg DESC;
+
+-- 2. Top 5 exercices les plus lourds toutes séances confondues
+--    (agrégation MAX + jointure 4 tables)
+SELECT u.pseudo,
+       e.nom            AS exercice,
+       MAX(sl.poids)    AS poids_max_kg
+FROM serie_log    sl
+JOIN seance        s ON sl.id_seance = s.id_seance
+JOIN Utilisateurs  u ON s.id_user    = u.id
+JOIN exercice      e ON sl.id_ex     = e.id_ex
+WHERE sl.type_serie <> 'warmup'
+GROUP BY u.pseudo, e.nom
+ORDER BY poids_max_kg DESC
+LIMIT 5;
+
+-- 3. Détail complet d'une séance (jointure 6 tables)
+SELECT u.pseudo,
+       e.nom            AS exercice,
+       m.nom_muscle     AS muscle,
+       sl.poids,
+       sl.reps,
+       sl.rpe,
+       sl.type_serie
+FROM serie_log    sl
+JOIN seance        s ON sl.id_seance = s.id_seance
+JOIN Utilisateurs  u ON s.id_user    = u.id
+JOIN exercice      e ON sl.id_ex     = e.id_ex
+JOIN cibler        c ON e.id_ex      = c.id_ex
+JOIN Muscles       m ON c.id_muscle  = m.id_muscle
+WHERE sl.id_seance = 1
+ORDER BY e.nom, m.nom_muscle;
+
+-- 4. Utilisateurs ayant battu un PR au cours des 30 derniers jours
+--    (sous-requête avec IN)
+SELECT pseudo
+FROM Utilisateurs
+WHERE id IN (
+    SELECT id_utilisateur
+    FROM record_personnel
+    WHERE date_record >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+);
+
+-- 5. Historique complet des PR avec nom exercice et pseudo
+--    (jointure 3 tables + tri chronologique)
+SELECT u.pseudo,
+       e.nom            AS exercice,
+       rp.poids_max     AS record_kg,
+       rp.date_record
+FROM record_personnel rp
+JOIN Utilisateurs u ON rp.id_utilisateur = u.id
+JOIN exercice     e ON rp.id_ex          = e.id_ex
+ORDER BY rp.date_record DESC;
+
+-- 6. Nombre de séries par type pour chaque utilisateur
+--    (agrégation GROUP BY double + jointure)
+SELECT u.pseudo,
+       sl.type_serie,
+       COUNT(*)         AS nb_series
+FROM serie_log    sl
+JOIN seance        s ON sl.id_seance = s.id_seance
+JOIN Utilisateurs  u ON s.id_user    = u.id
+GROUP BY u.pseudo, sl.type_serie
+ORDER BY u.pseudo, nb_series DESC;
 SET FOREIGN_KEY_CHECKS = 1;

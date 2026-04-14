@@ -69,3 +69,4 @@ def explorer():
     finally:
         cursor.close()
         conn.close()
+        ## ca marche

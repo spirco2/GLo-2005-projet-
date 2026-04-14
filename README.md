@@ -16,10 +16,10 @@ Cette application illustre une architecture **3 tiers** avec :
 - **Frontend** : HTML, CSS, JavaScript  
 - **Backend** : Python avec Flask  
 - **Base de données** : MySQL  
-- **Outils** : Git, VS Code  
+- **Outils** : Git, pycharm 
 
 ---
-
+//
 ## Fonctionnalités principales
 
 - **Gestion des utilisateurs**
@@ -37,7 +37,7 @@ Cette application illustre une architecture **3 tiers** avec :
 - **Sécurité**
   - Hashage des mots de passe (bcrypt)
   - Protection des données sensibles
-
+//
 ---
 
 ## Architecture
@@ -58,7 +58,58 @@ Cette application illustre une architecture **3 tiers** avec :
 
 ## Installation et exécution
 
-1. **Cloner le projet**
+1. Initialisation de la base de données (Niveau 3)
+L'ordre d'importation est crucial pour respecter les contraintes d'intégrité référentielle (clés étrangères).
+
+A. Méthode recommandée (PyCharm)
+Pour garantir un encodage UTF-8 parfait (gestion des accents), utilisez l'outil "Database" de PyCharm :
+
+Faites un clic droit sur votre instance MySQL dans l'onglet Database.
+
+Sélectionnez "Run SQL Script...".
+
+Sélectionnez les fichiers dans cet ordre strict :
+
+1_muscle.sql (20 muscles)
+
+2_utilisateur.sql (20 profils + Procédure IMC)
+
+3_exercice.sql (100 exercices + 130 liaisons + Procédure Volume)
+
+4_programme.sql (20 programmes + Séances + Trigger Assiduité)
+
+5_serie_log.sql (100+ séries + Records personnels + Trigger PR)
+
+B. Méthode alternative (Terminal MySQL)
+Forcez l'encodage avant l'importation pour éviter la corruption des caractères :
+
+SQL
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+DROP DATABASE IF EXISTS db_local;
+
+SOURCE database/1_muscle.sql;
+SOURCE database/2_utilisateur.sql;
+SOURCE database/3_exercice.sql;
+SOURCE database/4_programme.sql;
+SOURCE database/5_serie_log.sql;
+
+SET FOREIGN_KEY_CHECKS = 1;
+2. Lancer l'application
+Bash
+pip install -r requirements.txt
+python app.py
+Accéder à : http://127.0.0.1:5000
+
+Vérification rapide pour l'évaluateur
+Le système est pré-peuplé avec des données réalistes permettant de valider immédiatement les exigences du cours  :
+
+Comptes de test : Tous les utilisateurs utilisent le mot de passe IronTrack2026.
+
+Volumétrie : Tables exercice (100 tuples) et serie_log (100+ tuples).
+
+Routines SQL : 2 procédures (imc_de_utilisateur, calculer_volume_seance) et 2 triggers (calcul_assiduite, update_pr) sont opérationnels.
+
+Sécurité : Hachage scrypt via Werkzeug et protection contre l'injection SQL via requêtes paramétrées.
 ```bash
-git clone https://github.com/spirco2/GLo-2005-projet-.git
-cd GLo-2005-projet-
+

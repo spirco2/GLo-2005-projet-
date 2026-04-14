@@ -70,23 +70,21 @@ def statistiques():
                 'pct':        pct
             })
 
-        # ── Séances récentes ───────────────────────────────
-        cursor.execute("""
-            SELECT s.id_seance,
-                   p.nom_programme         AS name,
-                   s.date_debut,
-                   COUNT(DISTINCT sl.id_ex) AS nb_exercises,
-                   TIME_TO_SEC(s.duree)     AS duree_sec
-            FROM seance s
-            JOIN programme p ON s.id_programme = p.id_programme
-            LEFT JOIN serie_log sl ON s.id_seance = sl.id_seance
-            WHERE s.id_user = %s
-            GROUP BY s.id_seance
-            ORDER BY s.date_debut DESC
-            LIMIT 5
-        """, (user_id,))
-        recent_workouts = cursor.fetchall()
-
+            # ── Séances récentes (requête imbriquée GLO-2005) ─────
+            cursor.execute("""
+                           SELECT s.id_seance,
+                                  p.nom_programme                     AS name,
+                                  s.date_debut,
+                                  (SELECT COUNT(DISTINCT sl2.id_ex)
+                                   FROM serie_log sl2
+                                   WHERE sl2.id_seance = s.id_seance) AS nb_exercises,
+                                  TIME_TO_SEC(s.duree)                AS duree_sec
+                           FROM seance s
+                                    JOIN programme p ON s.id_programme = p.id_programme
+                           WHERE s.id_user = %s
+                           ORDER BY s.date_debut DESC LIMIT 5
+                           """, (user_id,))
+            recent_workouts = cursor.fetchall()
         # ── Calendrier du mois courant ─────────────────────
         today = datetime.now()
         cursor.execute("""

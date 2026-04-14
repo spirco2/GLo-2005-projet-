@@ -96,12 +96,16 @@ SOURCE database/5_serie_log.sql;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
-1.1 FORMAT ENV
+## 1.1 FORMAT ENV
 
 DB_HOST=127.0.0.1
+
 DB_USER=root
+
 DB_PASSWORD=MDP
+
 DB_NAME=db_local
+
 DB_PORT=3306
 
 2. Lancer l'application

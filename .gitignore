@@ -1,5 +1,6 @@
 __pycache__/
 *.pyc
+chatbot_env/
 .env
 db.py
 .vscode/

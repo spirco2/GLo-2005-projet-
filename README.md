@@ -111,7 +111,11 @@ DB_PORT=3306
 2. Lancer l'application
 Bash
 pip install -r requirements.txt
-python app.py
+# Sur Windows, activez le venv puis lancez l'application :
+# .\chatbot_env\Scripts\activate
+# python app.py
+# Sur Linux / WSL :
+# python3 app.py
 Accéder à : http://127.0.0.1:5000
 
 Vérification rapide pour l'évaluateur

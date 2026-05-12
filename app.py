@@ -66,6 +66,7 @@ from routes.securite import bp as securite_bp
 from routes.programmes import bp as programmes_bp
 from routes.suivi import bp as suivi_bp
 from routes.admin import bp as admin_bp
+from routes.chatbot import bp as chatbot_bp
 
 
 app.register_blueprint(acceuil_bp)
@@ -74,6 +75,7 @@ app.register_blueprint(securite_bp)
 app.register_blueprint(programmes_bp)
 app.register_blueprint(suivi_bp)
 app.register_blueprint(admin_bp)
+app.register_blueprint(chatbot_bp)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

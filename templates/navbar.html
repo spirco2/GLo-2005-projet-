@@ -53,3 +53,204 @@
   </div>
 </div>
 {% endif %}
+
+<div id="chatbot-widget" class="chatbot-widget chatbot-closed" aria-live="polite">
+  <button id="chatbot-toggle" class="chatbot-toggle" aria-label="Ouvrir le chatbot">💬 Chat</button>
+  <div class="chatbot-panel" role="dialog" aria-label="Chatbot IronTrack">
+    <div class="chatbot-header">
+      <div>
+        <strong>Assistant IronTrack</strong>
+        <div class="chatbot-subtitle">Posez une question sur l'entraînement, la nutrition ou le site.</div>
+      </div>
+      <button id="chatbot-close" class="chatbot-close" aria-label="Fermer le chatbot">✕</button>
+    </div>
+    <div id="chatbot-messages" class="chatbot-messages">
+      <div class="chatbot-message bot">Bonjour ! Je peux vous aider sur l'entraînement, la nutrition et l'utilisation du site.</div>
+    </div>
+    <form id="chatbot-form" class="chatbot-form">
+      <input id="chatbot-input" type="text" placeholder="Écrire votre question…" aria-label="Question au chatbot" autocomplete="off" />
+      <button type="submit" class="chatbot-send">Envoyer</button>
+    </form>
+  </div>
+</div>
+
+<style>
+  #chatbot-widget {
+    position: fixed;
+    right: 1.4rem;
+    bottom: 1.4rem;
+    z-index: 10000;
+    font-family: 'Inter', sans-serif;
+  }
+  .chatbot-toggle {
+    border: none;
+    background: linear-gradient(135deg, #e8ff47, #c0f6ff);
+    color: #111;
+    box-shadow: 0 18px 40px rgba(0,0,0,.22);
+    border-radius: 999px;
+    padding: .95rem 1.2rem;
+    cursor: pointer;
+    font-weight: 700;
+    letter-spacing: .02em;
+  }
+  .chatbot-panel {
+    width: min(350px, calc(100vw - 2rem));
+    max-height: 520px;
+    transform: translateY(18px) scale(.95);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .22s ease, transform .22s ease, visibility .22s ease;
+    background: #111;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 22px;
+    box-shadow: 0 24px 60px rgba(0,0,0,.35);
+    overflow: hidden;
+    margin-top: .8rem;
+  }
+  .chatbot-widget.chatbot-open .chatbot-panel {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+  }
+  .chatbot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: .8rem;
+    padding: 1rem 1rem .7rem;
+    background: #151515;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+  .chatbot-subtitle {
+    margin-top: .2rem;
+    font-size: .78rem;
+    color: #9aa3b1;
+  }
+  .chatbot-close {
+    border: none;
+    background: transparent;
+    color: #aaa;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  .chatbot-messages {
+    max-height: 330px;
+    overflow-y: auto;
+    padding: 1rem;
+    display: grid;
+    gap: .75rem;
+    background: #0d0d0d;
+  }
+  .chatbot-message {
+    padding: .85rem 1rem;
+    border-radius: 18px;
+    font-size: .9rem;
+    line-height: 1.5;
+    color: #e5e7eb;
+    background: rgba(255,255,255,.04);
+  }
+  .chatbot-message.bot {
+    background: rgba(232,255,71,.12);
+    color: #f8f8f2;
+  }
+  .chatbot-message.user {
+    background: rgba(24, 144, 255, .14);
+    color: #d5e8ff;
+    justify-self: end;
+  }
+  .chatbot-form {
+    display: flex;
+    gap: .5rem;
+    padding: 1rem;
+    background: #111;
+    border-top: 1px solid rgba(255,255,255,.06);
+  }
+  .chatbot-form input {
+    flex: 1;
+    min-width: 0;
+    padding: .85rem 1rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: #0f0f11;
+    color: #f8f8f2;
+    outline: none;
+  }
+  .chatbot-form input::placeholder { color: #7f8fa3; }
+  .chatbot-send {
+    border: none;
+    padding: .85rem 1rem;
+    border-radius: 999px;
+    background: #e8ff47;
+    color: #111;
+    font-weight: 700;
+    cursor: pointer;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const widget = document.getElementById('chatbot-widget');
+    if (!widget) return;
+
+    const toggle = document.getElementById('chatbot-toggle');
+    const closeBtn = document.getElementById('chatbot-close');
+    const form = document.getElementById('chatbot-form');
+    const input = document.getElementById('chatbot-input');
+    const messages = document.getElementById('chatbot-messages');
+
+    const appendMessage = (text, sender) => {
+      const msg = document.createElement('div');
+      msg.className = 'chatbot-message ' + sender;
+      msg.textContent = text;
+      messages.appendChild(msg);
+      messages.scrollTop = messages.scrollHeight;
+    };
+
+    const setOpen = (open) => {
+      widget.classList.toggle('chatbot-open', open);
+      widget.classList.toggle('chatbot-closed', !open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) input.focus();
+    };
+
+    toggle.addEventListener('click', () => setOpen(!widget.classList.contains('chatbot-open')));
+
+    closeBtn.addEventListener('click', () => setOpen(false));
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const question = input.value.trim();
+      if (!question) return;
+
+      appendMessage(question, 'user');
+      input.value = '';
+      const loader = document.createElement('div');
+      loader.className = 'chatbot-message bot';
+      loader.textContent = 'Réponse en cours…';
+      messages.appendChild(loader);
+      messages.scrollTop = messages.scrollHeight;
+
+      try {
+        const response = await fetch('/api/chatbot', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question }),
+        });
+        const data = await response.json();
+
+        if (!response.ok || data.error) {
+          loader.textContent = 'Désolé, le chatbot est indisponible. Réessayez plus tard.';
+          console.error('Chatbot error:', data.error || response.statusText);
+          return;
+        }
+
+        loader.textContent = data.answer || 'Je n’ai pas de réponse pour le moment.';
+      } catch (err) {
+        loader.textContent = 'Erreur réseau, vérifiez votre connexion.';
+        console.error(err);
+      }
+    });
+  });
+</script>
